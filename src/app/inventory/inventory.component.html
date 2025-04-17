@@ -1,0 +1,46 @@
+<div class="inventory-container">
+    <div class="top-bar">
+        <div class="logo">
+            <span class="logo-text">Inventory</span>
+        </div>
+        <div class="categories-bar">
+            <ul class="categories-list">
+                <li *ngFor="let category of categories" (click)="selectCategory(category)"
+                    [class.active]="selectedCategory === category">
+                    {{ category }}
+                </li>
+            </ul>
+        </div>
+        <div class="search-bar">
+            <input type="text" [(ngModel)]="searchTerm" (input)="searchItems()" placeholder="Search items..."
+                class="search-input">
+            <button class="clear-search-button" (click)="clearSearch()" *ngIf="searchTerm">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <main class="main-content">
+        <div class="items-container">
+            <div class="items-header">
+                <h2 class="items-title">Inventario Disponible</h2>
+            </div>
+            <div class="items-grid">
+                <div *ngFor="let item of filteredItems" class="item-card">
+                    <img [src]="'assets/images/' + item.name.toLowerCase() + '.jpg'" alt="{{ item.name }}"
+                        class="item-image" onerror="this.onerror=null;this.src='assets/images/placeholder.jpg';">
+                    <div class="item-info">
+                        <h3 class="item-name">{{ item.name }}</h3>
+                        <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <select id="quantity" [(ngModel)]="item.selectedQuantity" class="quantity-select">
+                                <option *ngFor="let q of getQuantityOptions(item.quantity)" [value]="q">{{ q }}</option>
+                            </select>
+                        </div>
+                        <button (click)="addToBag(item)" class="add-to-bag-button">Add to Bag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
