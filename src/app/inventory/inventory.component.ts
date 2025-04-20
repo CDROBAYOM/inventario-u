@@ -166,10 +166,6 @@ export class InventoryComponent implements OnInit {
 
   getTotalItems(): number {
     const total = this.cartItems.reduce((total, item) => total + item.selectedQuantity, 0);
-    console.log('Calculating total items:', {
-      cartItems: this.cartItems,
-      total: total
-    });
     return total;
   }
 
@@ -207,13 +203,30 @@ export class InventoryComponent implements OnInit {
 
   confirmOrder(): void {
     if (this.cartItems.length > 0) {
-      // Aquí iría la lógica para procesar la orden
-      this.showSuccessPopup = true;
-      setTimeout(() => {
-        this.showSuccessPopup = false;
-        this.cartItems = [];
-        this.isCartOpen = false;
-      }, 3000);
+      const orderData = this.cartItems.map(item => ({
+        id: item.id,
+        nombre: item.name,
+        categoria: item.category,
+        cantidadSolicitada: item.selectedQuantity
+      }));
+
+      this.http.post('http://localhost:3000/api/orders', orderData)
+        .subscribe({
+          next: (response) => {
+            console.log('Solicitud enviada exitosamente:', response);
+            this.showSuccessPopup = true;
+            setTimeout(() => {
+              this.showSuccessPopup = false;
+              this.cartItems = [];
+              this.isCartOpen = false;
+            }, 3000);
+          },
+          error: (error) => {
+            console.error('Error al enviar la solicitud:', error);
+            console.log('OrderData', orderData);
+            this.errorMessage = 'Error al enviar la solicitud. Por favor, intente nuevamente.';
+          }
+        });
     }
   }
 
