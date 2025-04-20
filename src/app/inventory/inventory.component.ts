@@ -13,6 +13,9 @@ export interface InventoryItem {
   id: number;
 }
 
+export interface CartItem extends InventoryItem {
+  selectedQuantity: number;
+}
 
 @Component({
   selector: 'app-inventory',
@@ -23,25 +26,33 @@ export interface InventoryItem {
 })
 export class InventoryComponent implements OnInit {
   categories: string[] = [
-    'Electronics',
-    'Clothing',
-    'Books',
-    'Home',
+    'Regional 1',
+    'Regional 2',
+    'Regional 3',
+    'Regional 4',
+    'Regional 5',
   ];
   inventoryItems: InventoryItem[] = [];
   filteredItems: InventoryItem[] = [];
-  shoppingBag: InventoryItem[] = [];
+  cartItems: CartItem[] = [];
   selectedCategory: string | null = null;
   searchTerm: string = '';
   itemQuantities: { [key: number]: number } = {};
+  isMenuOpen = false;
+  isMobile = false;
+  isCartOpen = false;
+  showSuccessPopup = false;
 
   ngOnInit(): void {
+    this.checkScreenSize();
+    window.addEventListener('resize', () => this.checkScreenSize());
+
     this.inventoryItems = [
-      { id: 1, name: 'Laptop', category: 'Electronics', quantity: 10, image: 'assets/images/laptop.jpg'}, /* OK */
-      { id: 2, name: 'Mouse', category: 'Electronics', quantity: 20, image: 'assets/images/mouse.jpg'}, /* OK */
-      { id: 3, name: 'Keyboard', category: 'Electronics', quantity: 15, image: 'assets/images/keyboard.jpg'}, /* OK */
-      { id: 4, name: 'Table', category: 'Home', quantity: 3, image: 'assets/images/table.jpg'}, /* OK */      
-      { id: 5, name: 'Charger', category: 'Electronics', quantity: 40, image: 'assets/images/charger.jpg'}, /* OK */
+      { id: 1, name: 'Laptop', category: 'Regional 1', quantity: 10, image: 'assets/images/laptop.jpg'}, /* OK */
+      { id: 2, name: 'Mouse', category: 'Regional 2', quantity: 20, image: 'assets/images/mouse.jpg'}, /* OK */
+      { id: 3, name: 'Keyboard', category: 'Regional 3', quantity: 15, image: 'assets/images/keyboard.jpg'}, /* OK */
+      { id: 4, name: 'Table', category: 'Regional 4', quantity: 3, image: 'assets/images/table.jpg'}, /* OK */      
+      { id: 5, name: 'Charger', category: 'Regional 5', quantity: 40, image: 'assets/images/charger.jpg'}, /* OK */
     ];
 
     this.inventoryItems.forEach(item => {
@@ -51,17 +62,80 @@ export class InventoryComponent implements OnInit {
     this.filterItems();
   }
 
+  checkScreenSize(): void {
+    this.isMobile = window.innerWidth < 768;
+    if (!this.isMobile) {
+      this.isMenuOpen = true;
+    }
+  }
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  toggleCart(): void {
+    this.isCartOpen = !this.isCartOpen;
+  }
+
+  selectCategory(category: string | null): void {
+    this.selectedCategory = category;
+    this.filterItems();
+    if (this.isMobile) {
+      this.isMenuOpen = false;
+    }
+  }
+
   getQuantityOptions(quantity: number): number[] {
     return Array.from({length: quantity}, (_, i) => i + 1);
   }
 
-  addToBag(item: InventoryItem): void {
+  addToCart(item: InventoryItem): void {
     const quantity = this.itemQuantities[item.id];
     if (quantity > 0 && quantity <= item.quantity) {
-      this.shoppingBag.push({...item, quantity: quantity});
+      const existingItem = this.cartItems.find(cartItem => cartItem.id === item.id);
+      
+      if (existingItem) {
+        existingItem.selectedQuantity += quantity;
+        existingItem.quantity -= quantity;
+      } else {
+        this.cartItems.push({
+          ...item,
+          selectedQuantity: quantity,
+          quantity: item.quantity - quantity
+        });
+      }
+      
       item.quantity -= quantity;
       this.filterItems();
     }
+  }
+
+  removeFromCart(cartItem: CartItem): void {
+    const itemIndex = this.cartItems.findIndex(item => item.id === cartItem.id);
+    if (itemIndex !== -1) {
+      const originalItem = this.inventoryItems.find(item => item.id === cartItem.id);
+      if (originalItem) {
+        originalItem.quantity += cartItem.selectedQuantity;
+      }
+      this.cartItems.splice(itemIndex, 1);
+      this.filterItems();
+    }
+  }
+
+  updateCartItemQuantity(cartItem: CartItem, newQuantity: number): void {
+    const originalItem = this.inventoryItems.find(item => item.id === cartItem.id);
+    if (originalItem) {
+      const quantityDifference = newQuantity - cartItem.selectedQuantity;
+      if (originalItem.quantity >= quantityDifference) {
+        cartItem.selectedQuantity = newQuantity;
+        originalItem.quantity -= quantityDifference;
+        this.filterItems();
+      }
+    }
+  }
+
+  getTotalItems(): number {
+    return this.cartItems.reduce((total, item) => total + item.selectedQuantity, 0);
   }
 
   filterItems() {
@@ -75,8 +149,12 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  selectCategory(category: string | null) {
-    this.selectedCategory = category;
+  searchItems() {
+    this.filterItems();
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
     this.filterItems();
   }
 
@@ -86,18 +164,25 @@ export class InventoryComponent implements OnInit {
   }
 
   removeItem(item: InventoryItem): void {
-    const index = this.shoppingBag.indexOf(item);
+    const index = this.inventoryItems.indexOf(item);
     if (index > -1) {
-      this.shoppingBag.splice(index, 1);
+      this.inventoryItems.splice(index, 1);
     }
   }
 
-  searchItems() {
-    this.filterItems();
+  confirmOrder(): void {
+    if (this.cartItems.length > 0) {
+      // Aquí iría la lógica para procesar la orden
+      this.showSuccessPopup = true;
+      setTimeout(() => {
+        this.showSuccessPopup = false;
+        this.cartItems = [];
+        this.isCartOpen = false;
+      }, 3000);
+    }
   }
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.filterItems();
-  }  
+  closeSuccessPopup(): void {
+    this.showSuccessPopup = false;
+  }
 }

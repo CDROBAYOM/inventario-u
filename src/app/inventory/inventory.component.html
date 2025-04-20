@@ -1,25 +1,40 @@
 <div class="inventory-container">
     <div class="top-bar">
-        <div class="logo">
-            <span class="logo-text">Inventory</span>
+        <div class="menu-toggle" (click)="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
-        <div class="categories-bar">
-            <ul class="categories-list">
-                <li *ngFor="let category of categories" (click)="selectCategory(category)"
-                    [class.active]="selectedCategory === category">
-                    {{ category }}
-                </li>
-            </ul>
+        <div class="logo">
+            <span class="logo-text">Solicitud de inventario U-Claro</span>
         </div>
         <div class="search-bar">
-            <input type="text" [(ngModel)]="searchTerm" (input)="searchItems()" placeholder="Search items..."
+            <input type="text" [(ngModel)]="searchTerm" (input)="searchItems()" placeholder="Buscar items..."
                 class="search-input">
             <button class="clear-search-button" (click)="clearSearch()" *ngIf="searchTerm">
                 <i class="fas fa-times"></i>
             </button>
         </div>
+        <div class="cart-toggle" (click)="toggleCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" *ngIf="getTotalItems() > 0">{{ getTotalItems() }}</span>
+        </div>
     </div>
-    <main class="main-content">
+
+    <div class="categories-container" [class.open]="isMenuOpen">
+        <ul class="categories-list">
+            <li (click)="selectCategory(null)" [class.active]="selectedCategory === null">
+                Todas
+            </li>
+            <li *ngFor="let category of categories" 
+                (click)="selectCategory(category)"
+                [class.active]="selectedCategory === category">
+                {{ category }}
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content" [class.cart-open]="isCartOpen">
         <div class="items-container">
             <div class="items-header">
                 <h2 class="items-title">Inventario Disponible</h2>
@@ -30,17 +45,63 @@
                         class="item-image" onerror="this.onerror=null;this.src='assets/images/placeholder.jpg';">
                     <div class="item-info">
                         <h3 class="item-name">{{ item.name }}</h3>
-                        <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+                        <p class="item-quantity">Cantidad: {{ item.quantity }}</p>
                         <div class="quantity-selector">
-                            <label for="quantity">Quantity:</label>
+                            <label for="quantity">Cantidad:</label>
                             <select id="quantity" [(ngModel)]="itemQuantities[item.id]" class="quantity-select">
                                 <option *ngFor="let q of getQuantityOptions(item.quantity)" [value]="q">{{ q }}</option>
                             </select>
                         </div>
-                        <button (click)="addToBag(item)" class="add-to-bag-button">Add to Bag</button>
+                        <button (click)="addToCart(item)" class="add-to-bag-button">Añadir al carrito</button>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+
+        <div class="cart-container" [class.open]="isCartOpen">
+            <div class="cart-header">
+                <h3>Carrito de Compras</h3>
+                <button class="close-cart" (click)="toggleCart()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-items">
+                <div *ngFor="let item of cartItems" class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>{{ item.name }}</h4>
+                        <div class="cart-item-quantity">
+                            <label>Cantidad:</label>
+                            <select [(ngModel)]="item.selectedQuantity" 
+                                    (change)="updateCartItemQuantity(item, $any($event.target).value)"
+                                    class="cart-quantity-select">
+                                <option *ngFor="let q of getQuantityOptions(item.selectedQuantity + item.quantity)" 
+                                        [value]="q">{{ q }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="remove-item" (click)="removeFromCart(item)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="empty-cart" *ngIf="cartItems.length === 0">
+                    <p>El carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer" *ngIf="cartItems.length > 0">
+                <button class="confirm-order-button" (click)="confirmOrder()">
+                    Confirmar Solicitud
+                </button>
+            </div>
+        </div>
+
+        <div class="success-popup" *ngIf="showSuccessPopup">
+            <div class="popup-content">
+                <i class="fas fa-check-circle"></i>
+                <h3>¡Solicitud Exitosa!</h3>
+                <p>Tu solicitud ha sido procesada correctamente.</p>
+                <button class="close-popup" (click)="closeSuccessPopup()">Cerrar</button>
+            </div>
+        </div>
+    </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</div>
