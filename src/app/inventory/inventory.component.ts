@@ -18,6 +18,7 @@ export interface InventoryItem {
   selector: 'app-inventory',
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.css'],
+  standalone: true,
   imports: [CommonModule, FormsModule],
 })
 export class InventoryComponent implements OnInit {
@@ -36,16 +37,11 @@ export class InventoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.inventoryItems = [
-      { id: 1, name: 'Laptop', category: 'Electronics', quantity: 10, image: 'assets/images/laptop.jpg'},
-      { id: 2, name: 'Mouse', category: 'Electronics', quantity: 20, image: 'assets/images/mouse.jpg'},
-      { id: 3, name: 'Keyboard', category: 'Electronics', quantity: 15, image: 'assets/images/keyboard.jpg'},
-      { id: 4, name: 'T-Shirt', category: 'Clothing', quantity: 50, image: 'assets/images/t-shirt.jpg' },
-      { id: 5, name: 'Jeans', category: 'Clothing', quantity: 30, image: 'assets/images/jeans.png' },
-      { id: 6, name: 'The Lord of the Rings', category: 'Books', quantity: 5, image: 'assets/images/the_lord_of_the_rings.gif' },
-      { id: 7, name: 'Harry Potter', category: 'Books', quantity: 8, image: 'assets/images/harry_potter.jpg'},
-      { id: 8, name: 'Table', category: 'Home', quantity: 3, image: 'assets/images/table.jpg'},
-      { id: 9, name: 'Chair', category: 'Home', quantity: 12, image: 'assets/images/chair.jpg'},
-      { id: 10, name: 'Charger', category: 'Electronics', quantity: 40, image: 'assets/images/charger.jpg'},
+      { id: 1, name: 'Laptop', category: 'Electronics', quantity: 10, image: 'assets/images/laptop.jpg'}, /* OK */
+      { id: 2, name: 'Mouse', category: 'Electronics', quantity: 20, image: 'assets/images/mouse.jpg'}, /* OK */
+      { id: 3, name: 'Keyboard', category: 'Electronics', quantity: 15, image: 'assets/images/keyboard.jpg'}, /* OK */
+      { id: 4, name: 'Table', category: 'Home', quantity: 3, image: 'assets/images/table.jpg'}, /* OK */      
+      { id: 5, name: 'Charger', category: 'Electronics', quantity: 40, image: 'assets/images/charger.jpg'}, /* OK */
     ];
 
     this.inventoryItems.forEach(item => {
@@ -53,12 +49,18 @@ export class InventoryComponent implements OnInit {
     });
 
     this.filterItems();
-  }  
-  selectCategory(category: string | null) {
-    this.selectedCategory = category;
-    this.filterItems();
-    if (window.innerWidth < 768) {
-      this.toggleMobileMenu();
+  }
+
+  getQuantityOptions(quantity: number): number[] {
+    return Array.from({length: quantity}, (_, i) => i + 1);
+  }
+
+  addToBag(item: InventoryItem): void {
+    const quantity = this.itemQuantities[item.id];
+    if (quantity > 0 && quantity <= item.quantity) {
+      this.shoppingBag.push({...item, quantity: quantity});
+      item.quantity -= quantity;
+      this.filterItems();
     }
   }
 
@@ -73,17 +75,14 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  addToBag(item: InventoryItem): void {
-    const selectedQuantity = this.itemQuantities[item.id] || 1;
-  
-    const existingItemIndex = this.shoppingBag.findIndex((i) => i.id === item.id);
-    if (existingItemIndex !== -1) {
-        this.shoppingBag[existingItemIndex].quantity += selectedQuantity;
-    } else {
-        this.shoppingBag.push({ ...item, quantity: selectedQuantity });
-      }
-  
-      this.itemQuantities[item.id] = 1;
+  selectCategory(category: string | null) {
+    this.selectedCategory = category;
+    this.filterItems();
+  }
+
+  toggleMobileMenu(): void {
+    // Implementación del menú móvil si es necesario
+    console.log('Toggle mobile menu');
   }
 
   removeItem(item: InventoryItem): void {
