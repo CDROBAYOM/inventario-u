@@ -1,9 +1,11 @@
 <div class="inventory-container">
     <div class="top-bar">
-        <div class="menu-toggle" (click)="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="mobile-controls">
+            <div class="menu-toggle" (click)="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
         <div class="logo">
             <span class="logo-text">Solicitud de inventario U-Claro</span>
@@ -15,10 +17,11 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="cart-toggle" (click)="toggleCart()">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-count" *ngIf="getTotalItems() > 0">{{ getTotalItems() }}</span>
-        </div>
+    </div>
+
+    <div class="cart-toggle" (click)="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" *ngIf="getTotalItems() > 0">{{ getTotalItems() }}</span>
     </div>
 
     <div class="categories-container" [class.open]="isMenuOpen">
@@ -39,9 +42,21 @@
             <div class="items-header">
                 <h2 class="items-title">Inventario Disponible</h2>
             </div>
-            <div class="items-grid">
+
+            <div class="loading-container" *ngIf="isLoading">
+                <div class="loading-spinner"></div>
+                <p>Cargando inventario...</p>
+            </div>
+
+            <div class="error-container" *ngIf="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>{{ errorMessage }}</p>
+                <button class="retry-button" (click)="loadInventory()">Reintentar</button>
+            </div>
+
+            <div class="items-grid" *ngIf="!isLoading && !errorMessage">
                 <div *ngFor="let item of filteredItems" class="item-card">
-                    <img [src]="'assets/images/' + item.name.toLowerCase() + '.jpg'" alt="{{ item.name }}"
+                    <img [src]="item.image" alt="{{ item.name }}"
                         class="item-image" onerror="this.onerror=null;this.src='assets/images/placeholder.jpg';">
                     <div class="item-info">
                         <h3 class="item-name">{{ item.name }}</h3>
@@ -67,27 +82,40 @@
             </div>
             <div class="cart-items">
                 <div *ngFor="let item of cartItems" class="cart-item">
+                    <div class="cart-item-image">
+                        <img [src]="item.image" alt="{{ item.name }}" class="item-thumbnail">
+                    </div>
                     <div class="cart-item-info">
                         <h4>{{ item.name }}</h4>
+                        <p class="cart-item-category">{{ item.category }}</p>
                         <div class="cart-item-quantity">
-                            <label>Cantidad:</label>
-                            <select [(ngModel)]="item.selectedQuantity" 
-                                    (change)="updateCartItemQuantity(item, $any($event.target).value)"
-                                    class="cart-quantity-select">
-                                <option *ngFor="let q of getQuantityOptions(item.selectedQuantity + item.quantity)" 
-                                        [value]="q">{{ q }}</option>
-                            </select>
+                            <label>Cantidad seleccionada:</label>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" (click)="decreaseQuantity(item)" [disabled]="item.selectedQuantity <= 1">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="quantity-value">{{ item.selectedQuantity }}</span>
+                                <button class="quantity-btn" (click)="increaseQuantity(item)" [disabled]="item.selectedQuantity >= item.quantity + item.selectedQuantity">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <p class="available-quantity">Disponible: {{ item.quantity }}</p>
                         </div>
                     </div>
-                    <button class="remove-item" (click)="removeFromCart(item)">
+                    <button class="remove-item" (click)="removeFromCart(item)" title="Eliminar del carrito">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
                 <div class="empty-cart" *ngIf="cartItems.length === 0">
+                    <i class="fas fa-shopping-cart"></i>
                     <p>El carrito está vacío</p>
                 </div>
             </div>
             <div class="cart-footer" *ngIf="cartItems.length > 0">
+                <div class="cart-summary">
+                    <p>Total de items: {{ getTotalItems() }}</p>
+                    <p>Productos diferentes: {{ cartItems.length }}</p>
+                </div>
                 <button class="confirm-order-button" (click)="confirmOrder()">
                     Confirmar Solicitud
                 </button>

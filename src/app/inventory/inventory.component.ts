@@ -2,15 +2,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 type Category = string;
 
 export interface InventoryItem {
+  id: number;
   name: string;
   category: string;
   quantity: number;
   image: string;
-  id: number;
 }
 
 export interface CartItem extends InventoryItem {
@@ -22,16 +23,10 @@ export interface CartItem extends InventoryItem {
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
 })
 export class InventoryComponent implements OnInit {
-  categories: string[] = [
-    'Regional 1',
-    'Regional 2',
-    'Regional 3',
-    'Regional 4',
-    'Regional 5',
-  ];
+  categories: string[] = [];
   inventoryItems: InventoryItem[] = [];
   filteredItems: InventoryItem[] = [];
   cartItems: CartItem[] = [];
@@ -42,24 +37,36 @@ export class InventoryComponent implements OnInit {
   isMobile = false;
   isCartOpen = false;
   showSuccessPopup = false;
+  isLoading = true;
+  errorMessage = '';
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.checkScreenSize();
     window.addEventListener('resize', () => this.checkScreenSize());
+    this.loadInventory();
+  }
 
-    this.inventoryItems = [
-      { id: 1, name: 'Laptop', category: 'Regional 1', quantity: 10, image: 'assets/images/laptop.jpg'}, /* OK */
-      { id: 2, name: 'Mouse', category: 'Regional 2', quantity: 20, image: 'assets/images/mouse.jpg'}, /* OK */
-      { id: 3, name: 'Keyboard', category: 'Regional 3', quantity: 15, image: 'assets/images/keyboard.jpg'}, /* OK */
-      { id: 4, name: 'Table', category: 'Regional 4', quantity: 3, image: 'assets/images/table.jpg'}, /* OK */      
-      { id: 5, name: 'Charger', category: 'Regional 5', quantity: 40, image: 'assets/images/charger.jpg'}, /* OK */
-    ];
-
-    this.inventoryItems.forEach(item => {
-        this.itemQuantities[item.id] = 1;
-    });
-
-    this.filterItems();
+  loadInventory(): void {
+    this.isLoading = true;
+    this.http.get<InventoryItem[]>('http://localhost:3000/api/inventory')
+      .subscribe({
+        next: (items) => {
+          this.inventoryItems = items;
+          this.categories = [...new Set(items.map(item => item.category))];
+          this.inventoryItems.forEach(item => {
+            this.itemQuantities[item.id] = 1;
+          });
+          this.filterItems();
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading inventory:', error);
+          this.errorMessage = 'Error al cargar el inventario. Por favor, intente nuevamente.';
+          this.isLoading = false;
+        }
+      });
   }
 
   checkScreenSize(): void {
@@ -90,19 +97,23 @@ export class InventoryComponent implements OnInit {
   }
 
   addToCart(item: InventoryItem): void {
+    console.log('addToCart', item);
+    console.log('idItem', item.id);
     const quantity = this.itemQuantities[item.id];
     if (quantity > 0 && quantity <= item.quantity) {
       const existingItem = this.cartItems.find(cartItem => cartItem.id === item.id);
       
       if (existingItem) {
+        console.log('existingItem', existingItem);
         existingItem.selectedQuantity += quantity;
-        existingItem.quantity -= quantity;
+        existingItem.quantity -= quantity;        
       } else {
         this.cartItems.push({
           ...item,
           selectedQuantity: quantity,
           quantity: item.quantity - quantity
         });
+        console.log('cartItems', this.cartItems);
       }
       
       item.quantity -= quantity;
@@ -116,6 +127,7 @@ export class InventoryComponent implements OnInit {
       const originalItem = this.inventoryItems.find(item => item.id === cartItem.id);
       if (originalItem) {
         originalItem.quantity += cartItem.selectedQuantity;
+        this.updateInventoryItemQuantity(originalItem.id, originalItem.quantity);
       }
       this.cartItems.splice(itemIndex, 1);
       this.filterItems();
@@ -129,13 +141,36 @@ export class InventoryComponent implements OnInit {
       if (originalItem.quantity >= quantityDifference) {
         cartItem.selectedQuantity = newQuantity;
         originalItem.quantity -= quantityDifference;
+        this.updateInventoryItemQuantity(originalItem.id, originalItem.quantity);
         this.filterItems();
       }
     }
   }
 
+  increaseQuantity(cartItem: CartItem): void {
+    const newQuantity = cartItem.selectedQuantity + 1;
+    this.updateCartItemQuantity(cartItem, newQuantity);
+  }
+
+  decreaseQuantity(cartItem: CartItem): void {
+    const newQuantity = cartItem.selectedQuantity - 1;
+    this.updateCartItemQuantity(cartItem, newQuantity);
+  }
+
+  private updateInventoryItemQuantity(itemId: number, newQuantity: number): void {
+    const item = this.inventoryItems.find(i => i.id === itemId);
+    if (item) {
+      item.quantity = newQuantity;
+    }
+  }
+
   getTotalItems(): number {
-    return this.cartItems.reduce((total, item) => total + item.selectedQuantity, 0);
+    const total = this.cartItems.reduce((total, item) => total + item.selectedQuantity, 0);
+    console.log('Calculating total items:', {
+      cartItems: this.cartItems,
+      total: total
+    });
+    return total;
   }
 
   filterItems() {
