@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   `,
   styles: [`
     .nav-container {
-      background-color: #2c3e50;
+      background-color: #da291c;
       padding: 1rem;
       display: flex;
       gap: 1rem;
@@ -31,7 +31,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       transform: translateY(-2px);
     }
     .nav-container a.active {
-      background-color: #3498db;
+      background-color:#d9291c;
       font-weight: 500;
     }
   `]
