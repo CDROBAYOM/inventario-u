@@ -13,6 +13,7 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
+  deliveryStatus: string;
   items: OrderItem[];
   orderId: string;
   applicationDate: string;

@@ -7,7 +7,7 @@
                 <input type="text" 
                        [(ngModel)]="searchTerm" 
                        (input)="searchOrders()" 
-                       placeholder="Buscar por número de orden..."
+                       placeholder="Buscar por número de orden"
                        class="search-input">
             </div>
             <div class="search-field">
@@ -45,6 +45,7 @@
                 <div class="order-dates">
                     <p><strong>Solicitud:</strong> {{ formatDate(order.applicationDate) }}</p>
                     <p><strong>Última actualización:</strong> {{ formatDate(order.updatedAt) }}</p>
+                    <p><strong>Estado:</strong> <span class="status-badge" [class]="'status-' + order.deliveryStatus.toLowerCase()">{{ order.deliveryStatus }}</span></p>
                 </div>
             </div>
 
