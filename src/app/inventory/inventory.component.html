@@ -63,7 +63,7 @@
                         <p class="item-quantity">Cantidad: {{ item.quantity }}</p>
                         <div class="quantity-selector">
                             <label for="quantity">Cantidad:</label>
-                            <select id="quantity" [(ngModel)]="itemQuantities[item.id]" class="quantity-select">
+                            <select id="quantity" [(ngModel)]="itemQuantities[item._id]" class="quantity-select">
                                 <option *ngFor="let q of getQuantityOptions(item.quantity)" [value]="q">{{ q }}</option>
                             </select>
                         </div>

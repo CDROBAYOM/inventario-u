@@ -7,7 +7,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 type Category = string;
 
 export interface InventoryItem {
-  id: number;
+  _id: number;
   name: string;
   category: string;
   quantity: number;
@@ -56,10 +56,11 @@ export class InventoryComponent implements OnInit {
           this.inventoryItems = items;
           this.categories = [...new Set(items.map(item => item.category))];
           this.inventoryItems.forEach(item => {
-            this.itemQuantities[item.id] = 1;
+            this.itemQuantities[item._id] = 1;
           });
           this.filterItems();
           this.isLoading = false;
+          console.log('inventoryItems', this.inventoryItems);
         },
         error: (error) => {
           console.error('Error loading inventory:', error);
@@ -98,15 +99,15 @@ export class InventoryComponent implements OnInit {
 
   addToCart(item: InventoryItem): void {
     console.log('addToCart', item);
-    console.log('idItem', item.id);
-    const quantity = this.itemQuantities[item.id];
+    console.log('idItem', item._id);
+    const quantity = this.itemQuantities[item._id];
     if (quantity > 0 && quantity <= item.quantity) {
-      const existingItem = this.cartItems.find(cartItem => cartItem.id === item.id);
+      const existingItem = this.cartItems.find(cartItem => cartItem._id === item._id);
       
       if (existingItem) {
         console.log('existingItem', existingItem);
         existingItem.selectedQuantity += quantity;
-        existingItem.quantity -= quantity;        
+        existingItem.quantity -= quantity;
       } else {
         this.cartItems.push({
           ...item,
@@ -122,12 +123,12 @@ export class InventoryComponent implements OnInit {
   }
 
   removeFromCart(cartItem: CartItem): void {
-    const itemIndex = this.cartItems.findIndex(item => item.id === cartItem.id);
+    const itemIndex = this.cartItems.findIndex(item => item._id === cartItem._id);
     if (itemIndex !== -1) {
-      const originalItem = this.inventoryItems.find(item => item.id === cartItem.id);
+      const originalItem = this.inventoryItems.find(item => item._id === cartItem._id);
       if (originalItem) {
         originalItem.quantity += cartItem.selectedQuantity;
-        this.updateInventoryItemQuantity(originalItem.id, originalItem.quantity);
+        this.updateInventoryItemQuantity(originalItem._id, originalItem.quantity);
       }
       this.cartItems.splice(itemIndex, 1);
       this.filterItems();
@@ -135,13 +136,13 @@ export class InventoryComponent implements OnInit {
   }
 
   updateCartItemQuantity(cartItem: CartItem, newQuantity: number): void {
-    const originalItem = this.inventoryItems.find(item => item.id === cartItem.id);
+    const originalItem = this.inventoryItems.find(item => item._id === cartItem._id);
     if (originalItem) {
       const quantityDifference = newQuantity - cartItem.selectedQuantity;
       if (originalItem.quantity >= quantityDifference) {
         cartItem.selectedQuantity = newQuantity;
         originalItem.quantity -= quantityDifference;
-        this.updateInventoryItemQuantity(originalItem.id, originalItem.quantity);
+        this.updateInventoryItemQuantity(originalItem._id, originalItem.quantity);
         this.filterItems();
       }
     }
@@ -158,7 +159,7 @@ export class InventoryComponent implements OnInit {
   }
 
   private updateInventoryItemQuantity(itemId: number, newQuantity: number): void {
-    const item = this.inventoryItems.find(i => i.id === itemId);
+    const item = this.inventoryItems.find(i => i._id === itemId);
     if (item) {
       item.quantity = newQuantity;
     }
@@ -204,10 +205,10 @@ export class InventoryComponent implements OnInit {
   confirmOrder(): void {
     if (this.cartItems.length > 0) {
       const orderData = this.cartItems.map(item => ({
-        id: item.id,
+        id: item._id,
         nombre: item.name,
         categoria: item.category,
-        cantidadSolicitada: item.selectedQuantity
+        cantidadSolicitada: Number(item.selectedQuantity)
       }));
 
       this.http.post('http://localhost:3000/api/orders', orderData)
