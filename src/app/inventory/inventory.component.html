@@ -8,15 +8,9 @@
             </div>
         </div>
         <div class="logo">
-            <span class="logo-text">Solicitud de inventario U-Claro</span>
+            <span class="logo-text">Solicitud U-Claro</span>
         </div>
-        <div class="search-bar">
-            <input type="text" [(ngModel)]="searchTerm" (input)="searchItems()" placeholder="Buscar items..."
-                class="search-input">
-            <button class="clear-search-button" (click)="clearSearch()" *ngIf="searchTerm">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+
     </div>
 
     <div class="cart-toggle" (click)="toggleCart()">
@@ -42,6 +36,16 @@
             <div class="items-header">
                 <h2 class="items-title">Inventario Disponible</h2>
             </div>
+
+            <div class="search-bar">
+                <input type="text" [(ngModel)]="searchTerm" (input)="searchItems()" placeholder="Buscar items..."
+                    class="search-input">
+                <button class="clear-search-button" (click)="clearSearch()" *ngIf="searchTerm">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <hr>    
 
             <div class="loading-container" *ngIf="isLoading">
                 <div class="loading-spinner"></div>

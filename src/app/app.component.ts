@@ -1,39 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink],
+  standalone: true,
+  imports: [RouterOutlet, NavbarComponent],
   template: `
-    <nav class="nav-container">
-      <a routerLink="/" routerLinkActive="active">Inventario</a>
-      <a routerLink="/orders" routerLinkActive="active">Solicitudes</a>
-    </nav>
+    <app-navbar></app-navbar>
     <router-outlet></router-outlet>
-  `,
-  styles: [`
-    .nav-container {
-      background-color:hsla(0, 3.30%, 29.60%, 0.91);
-      padding: 1rem;
-      display: flex;
-      gap: 1rem;
-      box-shadow: 0 2px 4px rgba(253, 253, 253, 0.97);
-    }
-    .nav-container a {
-      color: white;
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-    }
-    .nav-container a:hover {
-      background-color: #e74c3c;
-      transform: translateY(-2px);
-    }
-    .nav-container a.active {
-      background-color: #e74c3c;
-      font-weight: 500;
-    }
-  `]
+  `
 })
 export class AppComponent {}
