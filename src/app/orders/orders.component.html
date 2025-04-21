@@ -1,0 +1,51 @@
+<div class="orders-container">
+    <h1>Solicitudes Generadas</h1>
+
+    <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p>Cargando órdenes...</p>
+    </div>
+
+    <div class="error-container" *ngIf="errorMessage">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>{{ errorMessage }}</p>
+        <button class="retry-button" (click)="loadOrders()">Reintentar</button>
+    </div>
+
+    <div class="orders-list" *ngIf="!isLoading && !errorMessage">
+        <div *ngIf="orders.length === 0" class="empty-orders">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No hay órdenes registradas</p>
+        </div>
+
+        <div *ngFor="let order of orders" class="order-card">
+            <div class="order-header">
+                <h3>Orden #{{ order.orderId }}</h3>
+                <div class="order-dates">
+                    <p><strong>Creación:</strong> {{ formatDate(order.fechaCreacion) }}</p>
+                    <p><strong>Entrega:</strong> {{ formatDate(order.fechaEntrega) }}</p>
+                </div>
+            </div>
+
+            <div class="order-items">
+                <h4>Items de la Orden</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of order.items">
+                            <td>{{ item.nombre }}</td>
+                            <td>{{ item.categoria }}</td>
+                            <td>{{ item.cantidadSolicitada }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 
