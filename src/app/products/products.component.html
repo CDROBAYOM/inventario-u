@@ -1,0 +1,88 @@
+<div class="container">
+  <div class="form-container">
+    <h2>{{ isEditing ? 'Editar Producto' : 'Agregar Nuevo Producto' }}</h2>
+    <form (ngSubmit)="addProduct()" class="product-form">
+      <div class="form-group">
+        <label for="name">Nombre del Producto</label>
+        <input type="text" id="name" [(ngModel)]="newProduct.name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Categoría</label>
+        <select id="category" [(ngModel)]="newProduct.category" name="category" required>
+          <option value="">Seleccione una categoría</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Cantidad</label>
+        <input type="number" id="quantity" [(ngModel)]="newProduct.quantity" name="quantity" min="0" required>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Imagen</label>
+        <input type="file" id="image" (change)="onImageSelected($event)" accept="image/*">
+        <div class="image-preview" *ngIf="newProduct.image">
+          <img [src]="newProduct.image" alt="Preview">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="state">Estado</label>
+        <select id="state" [(ngModel)]="newProduct.state" name="state" required>
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          {{ isEditing ? 'Actualizar' : 'Agregar' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="resetForm()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="products-table">
+    <h2>Lista de Productos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td>{{ product.id }}</td>
+          <td>
+            <img [src]="product.image" alt="{{ product.name }}" class="product-image">
+          </td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.category }}</td>
+          <td>{{ product.quantity }}</td>
+          <td>
+            <span [class]="product.state ? 'status-active' : 'status-inactive'">
+              {{ product.state ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button (click)="editProduct(product)" class="btn btn-edit">Editar</button>
+            <button (click)="deleteProduct(product)" class="btn btn-delete">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> 
