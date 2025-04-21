@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 export interface OrderItem {
   id: string;
@@ -25,12 +26,15 @@ export interface Order {
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
   standalone: true,
-  imports: [CommonModule, HttpClientModule]
+  imports: [CommonModule, HttpClientModule, FormsModule]
 })
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
+  filteredOrders: Order[] = [];
   isLoading = true;
   errorMessage = '';
+  searchTerm: string = '';
+  searchDate: string = '';
 
   constructor(private http: HttpClient) {}
 
@@ -45,6 +49,7 @@ export class OrdersComponent implements OnInit {
         next: (orders) => {
           console.log(orders);
           this.orders = orders;
+          this.filteredOrders = [...orders];
           this.isLoading = false;
         },
         error: (error) => {
@@ -73,5 +78,30 @@ export class OrdersComponent implements OnInit {
 
   getLastThreeChars(orderId: string): string {
     return orderId.slice(-5);
+  }
+
+  searchOrders(): void {
+    if (!this.searchTerm && !this.searchDate) {
+      this.filteredOrders = [...this.orders];
+      return;
+    }
+
+    this.filteredOrders = this.orders.filter(order => {
+      const matchesSearchTerm = this.searchTerm 
+        ? order.orderId.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true;
+
+      const matchesDate = this.searchDate
+        ? new Date(order.applicationDate).toISOString().split('T')[0] === this.searchDate
+        : true;
+
+      return matchesSearchTerm && matchesDate;
+    });
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchDate = '';
+    this.filteredOrders = [...this.orders];
   }
 } 

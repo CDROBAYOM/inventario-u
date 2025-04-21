@@ -147,4 +147,67 @@ tr:hover {
         display: block;
         overflow-x: auto;
     }
+}
+
+.search-container {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-fields {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-input, .date-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus, .date-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.clear-search {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.clear-search:hover {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .search-fields {
+        flex-direction: column;
+    }
+
+    .search-field {
+        width: 100%;
+    }
+
+    .clear-search {
+        align-self: flex-end;
+    }
 } 
