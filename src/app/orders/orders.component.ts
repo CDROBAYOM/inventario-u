@@ -3,17 +3,21 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 export interface OrderItem {
-  id: number;
+  id: string;
   nombre: string;
   categoria: string;
   cantidadSolicitada: number;
+  _id: string;
 }
 
 export interface Order {
-  orderId: string;
+  _id: string;
   items: OrderItem[];
-  fechaCreacion: string;
-  fechaEntrega: string;
+  orderId: string;
+  applicationDate: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 @Component({
@@ -39,6 +43,7 @@ export class OrdersComponent implements OnInit {
     this.http.get<Order[]>('http://localhost:3000/api/orders')
       .subscribe({
         next: (orders) => {
+          console.log(orders);
           this.orders = orders;
           this.isLoading = false;
         },
@@ -47,16 +52,26 @@ export class OrdersComponent implements OnInit {
           this.errorMessage = 'Error al cargar las órdenes. Por favor, intente nuevamente.';
           this.isLoading = false;
         }
-      });
+      });      
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    if (!dateString) return 'No disponible';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Fecha inválida';
+
+    return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
     });
+  }
+
+  getLastThreeChars(orderId: string): string {
+    return orderId.slice(-5);
   }
 } 

@@ -20,10 +20,10 @@
 
         <div *ngFor="let order of orders" class="order-card">
             <div class="order-header">
-                <h3>Orden #{{ order.orderId }}</h3>
+                <h3>Orden: {{ getLastThreeChars(order.orderId) }}</h3>
                 <div class="order-dates">
-                    <p><strong>Creación:</strong> {{ formatDate(order.fechaCreacion) }}</p>
-                    <p><strong>Entrega:</strong> {{ formatDate(order.fechaEntrega) }}</p>
+                    <p><strong>Solicitud:</strong> {{ formatDate(order.applicationDate) }}</p>
+                    <p><strong>Última actualización:</strong> {{ formatDate(order.updatedAt) }}</p>
                 </div>
             </div>
 
