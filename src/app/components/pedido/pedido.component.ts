@@ -133,8 +133,8 @@ export class PedidoComponent implements OnInit {
     this.pedidoService.createPedido(pedido).subscribe({
       next: (pedido) => {
         this.userMessage = 'Pedido realizado exitosamente';
-        this.cartItems.forEach(item => {
-          console.log(item);
+        // Actualizar el stock de los productos
+        this.cartItems.forEach(item => {          
           this.updateProduct(item);
         });
         this.cartItems = [];
@@ -149,11 +149,10 @@ export class PedidoComponent implements OnInit {
 
   updateProduct(product: CartItem) {
     let formData = new FormData();
-    
+    // Actualizar el stock del producto
     formData.append('stockActual', (product.stockActual - product.selectedQuantity).toString());
-    console.log(product.stockActual.toString());
-    console.log(product.selectedQuantity.toString());
 
+    // Actualizar el estado del producto
     this.productoService.updateProducto(product.productoId, formData).subscribe({
       next: () => {
         this.userMessage = 'Producto actualizado exitosamente';

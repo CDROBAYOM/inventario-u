@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { ProductoService } from './services/producto.services';
 import { Producto } from './models/producto.model';
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule, RouterModule],
   templateUrl: './producto.component.html',
   styleUrls: ['./producto.component.css']
 })
@@ -17,6 +18,14 @@ import { Router } from '@angular/router';
 export class ProductoComponent implements OnInit {
 
   products: Producto[] = [];
+  categories: string[] = ['REGIONAL 1', 'REGIONAL 2', 'REGIONAL 3', 'REGIONAL 4', 'REGIONAL 5', 'GERENCIA'];
+  showModal: boolean = false;
+  isLoading: boolean = false;
+  userMessage: string = '';
+  previewUrl: string | null = null;
+  selectedFile: File | null = null;
+
+  productForm: FormGroup;
 
   // Inicializa el nuevo producto con los tipos correctos
   newProduct: Producto = {
@@ -29,117 +38,125 @@ export class ProductoComponent implements OnInit {
     estado: 'DISPONIBLE'
   };
 
-  categories: string[] = ['Regional 1', 'Regional 2', 'Regional 3', 'Regional 4'];
   isEditing: boolean = false;
   selectedProduct: Producto | null = null;
-  // Variable para mensajes de usuario
-  userMessage: string = '';
 
-  // Considera agregar una variable para el archivo de imagen si lo vas a subir
-  selectedImageFile: File | null = null;
-
-
-  constructor(private productoService: ProductoService, private router: Router) {}
-
-  ngOnInit() {
-    this.loadProducts();
+  constructor(
+    private productoService: ProductoService,
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.productForm = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      categoria: ['', Validators.required],
+      stockActual: [0, [Validators.required, Validators.min(0)]],
+      estado: ['ACTIVO', Validators.required]
+    });
   }
 
-  loadProducts() {
+  ngOnInit(): void {
+    this.loadProducts();    
+  }
+
+  loadProducts(): void {
     this.userMessage = 'Cargando productos...';
     this.productoService.getProductos().subscribe({
-      next: (productos) => {
+      next: (productos: Producto[]) => {
         this.products = productos;
         this.userMessage = '';
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al cargar productos:', error);
         this.userMessage = 'Error al cargar productos.';
       }
-    })
-  }
-
-  // Nuevo método para manejar tanto la creación como la actualización al guardar
-  saveProduct() {
-      if (this.isEditing) {
-          this.updateProduct();
-      } else {
-          this.createProduct();
-      }
-  }
-
-  createProduct() {
-      // Validar datos básicos antes de enviar (puedes añadir más validación)
-      if (!this.newProduct.nombre || !this.newProduct.categoria) {
-          this.userMessage = 'Nombre y Categoría son obligatorios.';
-          return;
-      }
-      
-      console.log(this.newProduct.estado);
-      console.log(this.newProduct.descripcion);
-      
-      let formData = new FormData();
-      formData.append('nombre', this.newProduct.nombre);
-      formData.append('categoria', this.newProduct.categoria);
-      formData.append('descripcion', this.newProduct.descripcion);
-      formData.append('stockActual', this.newProduct.stockActual.toString());
-      formData.append('imagenURL', this.newProduct.imagenURL);
-      formData.append('estado', this.newProduct.estado.toString());
-            
-
-      if (this.selectedImageFile) {
-         formData.append('imagen', this.selectedImageFile, this.selectedImageFile.name);
-      }
-      
-      this.productoService.createProducto(formData).subscribe({
-          next: (productoCreado) => {
-              this.products.push(productoCreado);
-              this.userMessage = 'Producto creado exitosamente.';
-              this.resetForm();
-          },
-          error: (error) => {
-              console.error('Error al crear producto:', error);
-              this.userMessage = 'Error al crear el producto.';
-          }
-      });
-  }
-
-  updateProduct() {
-    
-    if (!this.selectedProduct) return;
-
-    // Convertir el objeto Producto a FormData dado que el backend retorna fechas que invalidan la petición
-    let formData = new FormData();
-    formData.append('nombre', this.newProduct.nombre);
-    formData.append('categoria', this.newProduct.categoria);
-    formData.append('descripcion', this.newProduct.descripcion);
-    formData.append('stockActual', this.newProduct.stockActual.toString());
-    formData.append('imagenURL', this.newProduct.imagenURL);
-    formData.append('estado', this.newProduct.estado.toString());
-
-    console.log(this.newProduct.estado.toString());
-
-    // Actualizar el producto
-    this.productoService.updateProducto(this.selectedProduct.productoId, formData).subscribe({
-      error: (error) => {
-        console.error('Error al actualizar producto:', error);
-        this.userMessage = 'Error al actualizar el producto.';
-      }
     });
-
-    // Recargar la pagina
-    window.location.reload();
   }
 
-  editProduct(product: Producto) {
+
+  openAddProductModal(): void {
+    this.showModal = true;
+    this.productForm.reset({
+      estado: 'ACTIVO',
+      stockActual: 0
+    });
+    this.previewUrl = null;
+    this.selectedFile = null;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.productForm.reset();
+    this.previewUrl = null;
+    this.selectedFile = null;
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.previewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
+  onSubmit(): void {
+    if (this.productForm.valid) {
+      this.isLoading = true;
+      const formData = new FormData();
+
+      // Append form values
+      Object.keys(this.productForm.value).forEach(key => {
+        formData.append(key, this.productForm.value[key]);
+      });
+
+      // Append file if selected
+      if (this.selectedFile) {
+        formData.append('imagen', this.selectedFile);
+      }
+
+      this.productoService.createProducto(formData).subscribe({
+        next: (response: Producto) => {
+          this.userMessage = 'Producto creado exitosamente';
+          this.closeModal();
+          this.loadProducts();
+        },
+        error: (error: any) => {
+          console.error('Error al crear producto:', error);
+          this.userMessage = 'Error al crear el producto. Por favor, intente nuevamente.';
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  handlePopupAction(): void {
+    if (this.userMessage.includes('exitosamente')) {
+      this.router.navigate(['/productos']);
+    }
+    this.userMessage = '';
+  }
+
+  editProduct(product: Producto): void {
     this.isEditing = true;
     this.selectedProduct = product;
-    // Copiar los datos del producto al formulario newProduct para editar
-    this.newProduct = { ...product };
-    this.userMessage = ''; // Limpiar mensajes al iniciar edición
+    this.productForm.patchValue({
+      nombre: product.nombre,
+      descripcion: product.descripcion,
+      categoria: product.categoria,
+      stockActual: product.stockActual,
+      estado: product.estado
+    });
+    this.previewUrl = product.imagenURL;
+    this.showModal = true;
   }
 
-  deleteProduct(product: Producto) {
+  deleteProduct(product: Producto): void {
     console.log(product.productoId);
     if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {        
         return; // Cancelar si el usuario no confirma
@@ -154,7 +171,7 @@ export class ProductoComponent implements OnInit {
             this.userMessage = 'Producto eliminado exitosamente.';
             this.resetForm(); // Limpiar formulario si el producto eliminado era el seleccionado
         },
-        error: (error) => {
+        error: (error: any) => {
             console.error('Error al eliminar producto:', error);
              this.userMessage = 'Error al eliminar el producto.';
         }
@@ -174,32 +191,6 @@ export class ProductoComponent implements OnInit {
     this.isEditing = false;
     this.selectedProduct = null;
     this.userMessage = '';
-    this.selectedImageFile = null;
-  }
-
-  onImageSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.selectedImageFile = input.files[0]; // Guarda el archivo
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        // Esto es solo para previsualizar la imagen en el formulario
-        this.newProduct.imagenURL = e.target.result;
-      };
-      reader.readAsDataURL(input.files[0]);
-    } else {
-      this.selectedImageFile = null;
-      this.newProduct.imagenURL = ''; // Limpiar la URL de previsualización si no hay archivo
-    }
-  }
-
-  handlePopupAction() {
-    if (this.userMessage.includes('exitosamente')) {
-      // Si fue exitoso, redirigir a la lista de productos
-      this.router.navigate(['/productos']);
-    } else {
-      // Si fue error, limpiar el mensaje
-      this.userMessage = '';
-    }
+    this.selectedFile = null;
   }
 }

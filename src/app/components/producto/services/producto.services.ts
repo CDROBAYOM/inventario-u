@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Producto } from '../models/producto.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -9,12 +10,16 @@ import { Producto } from '../models/producto.model';
 
 export class ProductoService {
 
-    private apiUrl = 'http://localhost:3000/api/productos';
+    private apiUrl = `${environment.apiUrl}/productos`;
 
     constructor(private http: HttpClient) { }
 
     getProductos(): Observable<Producto[]> {
         return this.http.get<Producto[]>(this.apiUrl);
+    }
+
+    getCategorias(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.apiUrl}/categorias`);
     }
 
     getProducto(id: string): Observable<Producto> {
