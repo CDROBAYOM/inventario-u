@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http'; // No es necesario si ya está en AppModule o en el servicio
 import { ProductoService } from './services/producto.services';
 import { Producto } from './models/producto.model';
 import { Router } from '@angular/router';
@@ -10,7 +9,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // HttpClientModule ya no necesario aquí si solo lo usa el servicio
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './producto.component.html',
   styleUrls: ['./producto.component.css']
 })
