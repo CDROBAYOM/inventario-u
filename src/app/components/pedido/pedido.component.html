@@ -3,8 +3,12 @@
     <div class="header">
         <h1>Gestión de Pedidos</h1>
         <div class="search-bar">
-            <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar productos...">
-            <select [(ngModel)]="selectedCategory">
+            <input type="text" 
+                   [(ngModel)]="searchTerm" 
+                   (ngModelChange)="filterProducts()"
+                   placeholder="Buscar productos...">
+            <select [(ngModel)]="selectedCategory" 
+                    (ngModelChange)="filterProducts()">
                 <option value="">Todas las categorías</option>
                 <option *ngFor="let category of categories" [value]="category">
                     {{ category }}
@@ -14,7 +18,7 @@
     </div>
 
     <div class="products-grid">
-        <div *ngFor="let product of products" class="product-card">
+        <div *ngFor="let product of filteredProducts" class="product-card">
             <img [src]="product.imagenURL" [alt]="product.nombre" class="product-image">
             <div class="product-info">
                 <h3>{{ product.nombre }}</h3>
@@ -25,14 +29,25 @@
                     <span>{{ getItemQuantity(product) }}</span>
                     <button (click)="increaseQuantity(product)" [disabled]="product.stockActual <= getItemQuantity(product)">+</button>
                 </div>
-                <button class="add-to-cart" (click)="addToCart(product)" [disabled]="!getItemQuantity(product)">
+                <button class="add-to-cart" 
+                        (click)="addToCart(product)" 
+                        [disabled]="!getItemQuantity(product)">
                     Agregar al carrito
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="cart-container" [class.open]="isCartOpen">
+    <!-- Fixed Cart Button -->
+    <button class="cart-button" (click)="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" *ngIf="cartItems.length > 0">
+            {{ getTotalItems() }}
+        </span>
+    </button>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" [class.open]="isCartOpen">
         <div class="cart-header">
             <h2>Carrito de Compras</h2>
             <button class="close-cart" (click)="toggleCart()">×</button>
@@ -46,10 +61,19 @@
                 </div>
                 <button class="remove-item" (click)="removeFromCart(item)">×</button>
             </div>
+            <div class="empty-cart" *ngIf="cartItems.length === 0">
+                <p>El carrito está vacío</p>
+            </div>
         </div>
         <div class="cart-footer">
-            <button class="checkout-btn" (click)="checkout()" [disabled]="!cartItems.length">
-                Realizar Pedido
+            <div class="cart-total">
+                <span>Total de productos:</span>
+                <span>{{ getTotalItems() }}</span>
+            </div>
+            <button class="checkout-btn" 
+                    (click)="checkout()" 
+                    [disabled]="!cartItems.length">
+                Realizar Solicitud
             </button>
         </div>
     </div>

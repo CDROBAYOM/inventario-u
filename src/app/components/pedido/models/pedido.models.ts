@@ -1,7 +1,6 @@
 import { Producto } from "../../producto/models/producto.model";
 
-export interface Pedido {
-    pedidoId: string;
+export interface Pedido {    
     cantidad: string;
     estado: string;
     total: number;

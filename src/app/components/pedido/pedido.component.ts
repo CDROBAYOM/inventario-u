@@ -7,7 +7,8 @@ import { ProductoService } from '../producto/services/producto.services';
 import { Producto } from '../producto/models/producto.model';
 import { Pedido } from './models/pedido.models';
 import { Router } from '@angular/router';
-import { CartItem } from './models/CartItem.models';
+import { CartItem } from './models/cartItem.models'
+import { PedidoService } from './services/pedido.services';
 
 @Component({
   selector: 'app-pedido',
@@ -32,8 +33,9 @@ export class PedidoComponent implements OnInit {
   isMobile = false;
   products: Producto[] = [];
   userMessage: string = '';
+  filteredProducts: Producto[] = [];
 
-  constructor(private productoService: ProductoService, private router: Router) {}
+  constructor(private productoService: ProductoService, private router: Router, private pedidoService: PedidoService) {}
 
   ngOnInit(): void {    
     this.loadInventory();
@@ -43,13 +45,24 @@ export class PedidoComponent implements OnInit {
     this.productoService.getProductos().subscribe({
       next: (productos) => {
         this.products = productos;
+        this.filteredProducts = [...productos];
+        this.categories = [...new Set(productos.map(p => p.categoria))];
         this.userMessage = '';
       },
       error: (error) => {
         console.error('Error al cargar productos:', error);
         this.userMessage = 'Error al cargar productos.';
       }
-    })
+    });
+  }
+
+  filterProducts(): void {
+    this.filteredProducts = this.products.filter(product => {
+      const matchesSearch = product.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                          product.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesCategory = !this.selectedCategory || product.categoria === this.selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
   }
   
   getItemQuantity(product: Producto): number {
@@ -99,13 +112,60 @@ export class PedidoComponent implements OnInit {
 
   checkout(): void {
     if (this.cartItems.length === 0) return;    
-    // Aquí iría la lógica para procesar el pedido
-    this.userMessage = 'Pedido realizado exitosamente';
-    this.cartItems = [];
-    this.isCartOpen = false;
+    const pedido: Pedido = {      
+      cantidad: this.getTotalItems().toString(),
+      estado: 'PENDIENTE',
+      total: this.getTotalItems(),
+      coordinacionId: '',
+      categoria: this.cartItems[0].categoria,
+      productos: this.cartItems.map(item => ({
+        productoId: item.productoId,
+        nombre: item.nombre,
+        descripcion: item.descripcion,
+        stockActual: item.stockActual,
+        imagenURL: item.imagenURL,
+        categoria: item.categoria,
+        estado: item.estado
+      })),
+      personaQueRecoge: ''
+    };
+    
+    this.pedidoService.createPedido(pedido).subscribe({
+      next: (pedido) => {
+        this.userMessage = 'Pedido realizado exitosamente';
+        this.cartItems.forEach(item => {
+          console.log(item);
+          this.updateProduct(item);
+        });
+        this.cartItems = [];
+        this.isCartOpen = false;
+        this.loadInventory();
+      },
+      error: (error) => {
+        this.userMessage = 'Error al realizar el pedido';
+      }
+    });
   }
 
+  updateProduct(product: CartItem) {
+    let formData = new FormData();
+    
+    formData.append('stockActual', (product.stockActual - product.selectedQuantity).toString());
+    console.log(product.stockActual.toString());
+    console.log(product.selectedQuantity.toString());
+
+    this.productoService.updateProducto(product.productoId, formData).subscribe({
+      next: () => {
+        this.userMessage = 'Producto actualizado exitosamente';
+        this.loadInventory();
+      }
+    });
+  }
   handlePopupAction(): void {
     this.userMessage = '';
+  }
+
+  getTotalItems(): number {
+    return this.cartItems.reduce((total, item) => total + item.selectedQuantity, 0);
   }
 }
