@@ -21,13 +21,13 @@ export class ProductoComponent implements OnInit {
 
   // Inicializa el nuevo producto con los tipos correctos
   newProduct: Producto = {
-    id: '', // El ID se generará en el backend
+    productoId: '', // El ID se generará en el backend
     nombre: '',
     descripcion: '',
     stockActual: 0,
     imagenURL: '', // URL pública de la imagen
     categoria: '',
-    estado: 'true'
+    estado: 'DISPONIBLE'
   };
 
   categories: string[] = ['Regional 1', 'Regional 2', 'Regional 3', 'Regional 4'];
@@ -63,7 +63,7 @@ export class ProductoComponent implements OnInit {
   // Nuevo método para manejar tanto la creación como la actualización al guardar
   saveProduct() {
       if (this.isEditing) {
-          /* this.updateProduct(); */
+          this.updateProduct();
       } else {
           this.createProduct();
       }
@@ -105,6 +105,32 @@ export class ProductoComponent implements OnInit {
       });
   }
 
+  updateProduct() {
+    
+    if (!this.selectedProduct) return;
+
+    // Convertir el objeto Producto a FormData dado que el backend retorna fechas que invalidan la petición
+    let formData = new FormData();
+    formData.append('nombre', this.newProduct.nombre);
+    formData.append('categoria', this.newProduct.categoria);
+    formData.append('descripcion', this.newProduct.descripcion);
+    formData.append('stockActual', this.newProduct.stockActual.toString());
+    formData.append('imagenURL', this.newProduct.imagenURL);
+    formData.append('estado', this.newProduct.estado.toString());
+
+    console.log(this.newProduct.estado.toString());
+
+    // Actualizar el producto
+    this.productoService.updateProducto(this.selectedProduct.productoId, formData).subscribe({
+      error: (error) => {
+        console.error('Error al actualizar producto:', error);
+        this.userMessage = 'Error al actualizar el producto.';
+      }
+    });
+
+    // Recargar la pagina
+    window.location.reload();
+  }
 
   editProduct(product: Producto) {
     this.isEditing = true;
@@ -115,16 +141,17 @@ export class ProductoComponent implements OnInit {
   }
 
   deleteProduct(product: Producto) {
-    if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {
+    console.log(product.productoId);
+    if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {        
         return; // Cancelar si el usuario no confirma
     }
 
     this.userMessage = 'Eliminando producto...';
 
-    this.productoService.deleteProducto(product.id).subscribe({
+    this.productoService.deleteProducto(product.productoId).subscribe({
         next: () => {
             // Eliminar el producto de la lista local solo si la API responde exitosamente
-            this.products = this.products.filter(p => p.id !== product.id);
+            this.products = this.products.filter(p => p.productoId !== product.productoId);
             this.userMessage = 'Producto eliminado exitosamente.';
             this.resetForm(); // Limpiar formulario si el producto eliminado era el seleccionado
         },
@@ -137,7 +164,7 @@ export class ProductoComponent implements OnInit {
 
   resetForm() {
     this.newProduct = {
-      id: '',
+      productoId: '',
       nombre: '',
       descripcion: '',
       stockActual: 0,

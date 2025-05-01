@@ -27,7 +27,7 @@ export class ProductoService {
     }
 
     updateProducto(id: string, producto: Producto | FormData): Observable<Producto> {
-        const url = `${this.apiUrl}/${id}`;
+        const url = `${this.apiUrl}/${id}`;        
         return this.http.put<Producto>(url, producto);
     }
 
