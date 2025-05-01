@@ -1,20 +1,20 @@
 import { Routes } from '@angular/router';
-import { InventoryComponent } from './components/inventory/inventory.component';
-import { OrdersComponent } from './components/orders/orders.component';
-import { ProductsComponent } from './components/products/products.component';
+import { PedidoComponent } from './components/pedido/pedido.component';
+import { SolicitudesComponent } from './components/solicitudes/solicitudes.component';
+import { ProductoComponent } from './components/producto/producto.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: InventoryComponent,
+    component: PedidoComponent,
     pathMatch: 'full'
   },
   {
     path: 'orders',
-    component: OrdersComponent
+    component: SolicitudesComponent
   },
   {
     path: 'products',
-    component: ProductsComponent
+    component: ProductoComponent
   }
 ];

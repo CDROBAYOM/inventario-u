@@ -1,15 +1,15 @@
 <div class="container">
   <div class="form-container">
     <h2>{{ isEditing ? 'Editar Producto' : 'Agregar Nuevo Producto' }}</h2>
-    <form (ngSubmit)="addProduct()" class="product-form">
+    <form (ngSubmit)="saveProduct()" class="product-form">
       <div class="form-group">
         <label for="name">Nombre del Producto</label>
-        <input type="text" id="name" [(ngModel)]="newProduct.name" name="name" required>
+        <input type="text" id="name" [(ngModel)]="newProduct.nombre" name="name" required>
       </div>
 
       <div class="form-group">
         <label for="category">Categoría</label>
-        <select id="category" [(ngModel)]="newProduct.category" name="category" required>
+        <select id="category" [(ngModel)]="newProduct.categoria" name="category" required>
           <option value="">Seleccione una categoría</option>
           <option *ngFor="let category of categories" [value]="category">
             {{ category }}
@@ -19,22 +19,22 @@
 
       <div class="form-group">
         <label for="quantity">Cantidad</label>
-        <input type="number" id="quantity" [(ngModel)]="newProduct.quantity" name="quantity" min="0" required>
+        <input type="number" id="quantity" [(ngModel)]="newProduct.stockActual" name="quantity" min="0" required>
       </div>
 
       <div class="form-group">
         <label for="image">Imagen</label>
         <input type="file" id="image" (change)="onImageSelected($event)" accept="image/*">
-        <div class="image-preview" *ngIf="newProduct.image">
-          <img [src]="newProduct.image" alt="Preview">
+        <div class="image-preview" *ngIf="newProduct.imagenURL">
+          <img [src]="newProduct.imagenURL" alt="Preview">
         </div>
       </div>
 
       <div class="form-group">
         <label for="state">Estado</label>
-        <select id="state" [(ngModel)]="newProduct.state" name="state" required>
-          <option [ngValue]="true">Activo</option>
-          <option [ngValue]="false">Inactivo</option>
+        <select id="state" [(ngModel)]="newProduct.estado" name="state" required>
+          <option value="true">DISPONIBLE</option>
+          <option value="false">AGOTADO</option>
         </select>
       </div>
 
@@ -47,6 +47,26 @@
         </button>
       </div>
     </form>
+  </div>
+
+  <!-- Popup de mensaje flotante -->
+  <div class="floating-popup" *ngIf="userMessage" 
+       [class.success]="userMessage.includes('exitosamente')" 
+       [class.error]="userMessage.includes('Error')">
+    <div class="popup-content">
+      <p>{{ userMessage }}</p>
+      <div class="popup-actions">
+        <button *ngIf="userMessage.includes('Error')" 
+                class="btn btn-retry" 
+                (click)="createProduct()">
+          Reintentar
+        </button>
+        <button class="btn btn-accept" 
+                (click)="handlePopupAction()">
+          {{ userMessage.includes('Error') ? 'Cancelar' : 'Aceptar' }}
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="products-table">
@@ -67,14 +87,14 @@
         <tr *ngFor="let product of products">
           <td>{{ product.id }}</td>
           <td>
-            <img [src]="product.image" alt="{{ product.name }}" class="product-image">
+            <img [src]="product.imagenURL" alt="{{ product.nombre }}" class="product-image">
           </td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.category }}</td>
-          <td>{{ product.quantity }}</td>
+          <td>{{ product.nombre }}</td>
+          <td>{{ product.categoria }}</td>
+          <td>{{ product.stockActual }}</td>
           <td>
-            <span [class]="product.state ? 'status-active' : 'status-inactive'">
-              {{ product.state ? 'Activo' : 'Inactivo' }}
+            <span [class]="product.estado ? 'status-active' : 'status-inactive'">
+              {{ product.estado ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td>

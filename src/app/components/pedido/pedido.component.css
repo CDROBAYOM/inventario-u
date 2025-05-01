@@ -1,6 +1,6 @@
-/* src/app/inventory/inventory.component.css */
+/* src/app/pedido/pedido.component.css */
 
-.inventory-container {
+.pedido-container {
   width: 100%;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -214,6 +214,11 @@
 
 .add-to-bag-button:hover {
   background-color: #da291c;
+}
+
+.add-to-bag-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
@@ -690,6 +695,28 @@
   .cart-container {
     width: 400px;
   }
+}
+
+.item-description {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.item-state {
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: inline-block;
+  background-color: #f8f9fa;
+  color: #666;
+}
+
+.item-state.active {
+  background-color: #d4edda;
+  color: #155724;
 }
 
 

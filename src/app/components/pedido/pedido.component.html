@@ -1,5 +1,5 @@
 <!-- Main Container -->
-<div class="inventory-container">
+<div class="pedido-container">
 
     <!-- Cart Toggle -->
     <div class="cart-toggle" (click)="toggleCart()">
@@ -57,23 +57,32 @@
             <!-- Items Grid -->
             <div class="items-grid" *ngIf="!isLoading && !errorMessage">
                 <div *ngFor="let item of filteredItems" class="item-card">
-                    <img [src]="item.image" 
-                         alt="{{ item.name }}"
+                    <img [src]="item.imagenURL" 
+                         alt="{{ item.nombre }}"
                          class="item-image" 
-                         onerror="this.onerror=null;this.src='assets/images/placeholder.jpg';">
+                         onerror="this.onerror=null;this.src='assets/images/laptop.jpg';">
                     <div class="item-info">
-                        <h3 class="item-name">{{ item.name }}</h3>
-                        <p class="item-quantity">Cantidad: {{ item.quantity }}</p>
+                        <h3 class="item-name">{{ item.nombre }}</h3>
+                        <p class="item-description">{{ item.descripcion }}</p>
+                        <p class="item-stock">Stock disponible: {{ item.stockActual }}</p>
+                        <p class="item-category">Categoría: {{ item.categoria }}</p>
+                        <p class="item-state" [class.active]="item.estado === 'true'">
+                            {{ item.estado === 'true' ? 'Disponible' : 'No disponible' }}
+                        </p>
                         <div class="quantity-selector">
                             <label for="quantity">Cantidad:</label>
                             <select id="quantity" 
-                                    [(ngModel)]="itemQuantities[item._id]" 
+                                    [(ngModel)]="itemQuantities[item.id]" 
                                     class="quantity-select">
-                                <option *ngFor="let q of getQuantityOptions(item.quantity)" 
+                                <option *ngFor="let q of getQuantityOptions(item.stockActual)" 
                                         [value]="q">{{ q }}</option>
                             </select>
                         </div>
-                        <button (click)="addToCart(item)" class="add-to-bag-button">Añadir al carrito</button>
+                        <button (click)="addToCart(item)" 
+                                class="add-to-bag-button"
+                                [disabled]="item.estado !== 'true' || item.stockActual <= 0">
+                            Añadir al carrito
+                        </button>
                     </div>
                 </div>
             </div>
@@ -90,11 +99,13 @@
             <div class="cart-items">
                 <div *ngFor="let item of cartItems" class="cart-item">
                     <div class="cart-item-image">
-                        <img [src]="item.image" alt="{{ item.name }}" class="item-thumbnail">
+                        <img [src]="item.imagenURL" alt="{{ item.nombre }}" class="item-thumbnail">
                     </div>
                     <div class="cart-item-info">
-                        <h4>{{ item.name }}</h4>
-                        <p class="cart-item-category">{{ item.category }}</p>
+                        <h4>{{ item.nombre }}</h4>
+                        <p class="cart-item-description">{{ item.descripcion }}</p>
+                        <p class="cart-item-stock">Stock: {{ item.stockActual }}</p>
+                        <p class="cart-item-category">{{ item.categoria }}</p>
                         <div class="cart-item-quantity">
                             <label>Cantidad seleccionada:</label>
                             <div class="quantity-controls">
@@ -105,12 +116,11 @@
                                 </button>
                                 <span class="quantity-value">{{ item.selectedQuantity }}</span>
                                 <button class="quantity-btn" 
-                                        (click)="increaseQuantity(item)" 
-                                        [disabled]="item.selectedQuantity >= item.quantity + item.selectedQuantity">
+                                        (click)="increaseQuantity(item)"
+                                        [disabled]="item.selectedQuantity >= item.stockActual">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
-                            <p class="available-quantity">Disponible: {{ item.quantity }}</p>
                         </div>
                     </div>
                     <button class="remove-item" 

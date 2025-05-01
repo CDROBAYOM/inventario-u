@@ -23,13 +23,13 @@ export interface Order {
 }
 
 @Component({
-  selector: 'app-orders',
-  templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.css'],
+  selector: 'app-solicitudes',
+  templateUrl: './solicitudes.component.html',
+  styleUrls: ['./solicitudes.component.css'],
   standalone: true,
   imports: [CommonModule, HttpClientModule, FormsModule]
 })
-export class OrdersComponent implements OnInit {
+export class SolicitudesComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   isLoading = true;
@@ -45,7 +45,7 @@ export class OrdersComponent implements OnInit {
 
   loadOrders(): void {
     this.isLoading = true;
-    this.http.get<Order[]>('http://localhost:3000/api/orders')
+    this.http.get<Order[]>('http://localhost:3000/api/productos')
       .subscribe({
         next: (orders) => {
           console.log(orders);
