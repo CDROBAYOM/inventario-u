@@ -112,7 +112,8 @@ export class PedidoComponent implements OnInit {
 
   checkout(): void {
     if (this.cartItems.length === 0) return;    
-    const pedido: Pedido = {      
+    const pedido: Pedido = {        
+      pedidoId: '',
       cantidad: this.getTotalItems().toString(),
       estado: 'PENDIENTE',
       total: this.getTotalItems(),

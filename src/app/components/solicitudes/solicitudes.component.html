@@ -1,73 +1,132 @@
 <div class="orders-container">
     <h1>Solicitudes Generadas</h1>
 
-    <div class="search-container">
-        <div class="search-fields">
-            <div class="search-field">
-                <input type="text" 
-                       [(ngModel)]="searchTerm" 
-                       (input)="searchOrders()" 
-                       placeholder="Buscar por número de orden"
-                       class="search-input">
+    <div class="orders-list">
+        <div *ngIf="filteredOrders.length === 0" class="empty-orders">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No se encontraron pedidos</p>
+        </div>
+
+        <div *ngFor="let order of getPaginatedOrders()" class="order-card">
+            <div class="order-details">
+                <div class="detail-row">
+                    <span class="label">Estado:</span>
+                    <span class="value status-badge" [class]="'status-' + order.estado.toLowerCase()">
+                        {{ order.estado }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Categoría:</span>
+                    <span class="value">{{ order.categoria }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Cantidad:</span>
+                    <span class="value">{{ order.cantidad }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Persona que recoge:</span>
+                    <span class="value">{{ order.personaQueRecoge }}</span>
+                </div>
+                <div class="detail-row">
+                    <button class="view-products-btn" (click)="openProductsModal(order)">
+                        <i class="fas fa-boxes"></i> Ver Productos
+                    </button>
+                </div>
+                <div class="detail-row">
+                    <button class="view-products-btn" (click)="openDeliveryModal(order)">
+                        <i class="fas fa-boxes"></i> Finalizar Entrega
+                    </button>
+                </div>                
             </div>
-            <div class="search-field">
-                <input type="date" 
-                       [(ngModel)]="searchDate" 
-                       (change)="searchOrders()" 
-                       class="date-input">
-            </div>
-            <button class="clear-search" (click)="clearSearch()" *ngIf="searchTerm || searchDate">
-                <i class="fas fa-times"></i>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="filteredOrders.length > 0">
+            <button (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span>Página {{ currentPage }} de {{ totalPages }}</span>
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <i class="fas fa-chevron-right"></i>
             </button>
         </div>
     </div>
+</div>
 
-    <div class="loading-container" *ngIf="isLoading">
-        <div class="loading-spinner"></div>
-        <p>Cargando órdenes...</p>
-    </div>
-
-    <div class="error-container" *ngIf="errorMessage">
-        <i class="fas fa-exclamation-circle"></i>
-        <p>{{ errorMessage }}</p>
-        <button class="retry-button" (click)="loadOrders()">Reintentar</button>
-    </div>
-
-    <div class="orders-list" *ngIf="!isLoading && !errorMessage">
-        <div *ngIf="filteredOrders.length === 0" class="empty-orders">
-            <i class="fas fa-clipboard-list"></i>
-            <p>No se encontraron órdenes</p>
+<!-- Products Modal -->
+<div class="modal" [class.show]="showProductsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Productos del Pedido</h3>
+            <button class="close-modal" (click)="closeProductsModal()">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-
-        <div *ngFor="let order of filteredOrders" class="order-card">
-            <div class="order-header">
-                <h3>Orden: {{ getLastThreeChars(order.orderId) }}</h3>
-                <div class="order-dates">
-                    <p><strong>Solicitud:</strong> {{ formatDate(order.applicationDate) }}</p>
-                    <p><strong>Última actualización:</strong> {{ formatDate(order.updatedAt) }}</p>
-                    <p><strong>Estado:</strong> <span class="status-badge" [class]="'status-' + order.deliveryStatus.toLowerCase()">{{ order.deliveryStatus }}</span></p>
-                </div>
-            </div>
-
-            <div class="order-items">
-                <h4>Items de la Orden</h4>
-                <table>
+        <div class="modal-body">
+            <div *ngIf="selectedOrder" class="products-table-container">
+                <table class="products-table">
                     <thead>
                         <tr>
                             <th>Nombre</th>
                             <th>Categoría</th>
-                            <th>Cantidad</th>
+                            <th>Stock</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let item of order.items">
-                            <td>{{ item.nombre }}</td>
-                            <td>{{ item.categoria }}</td>
-                            <td>{{ item.cantidadSolicitada }}</td>
+                        <tr *ngFor="let producto of selectedOrder.productos">
+                            <td data-label="Nombre">{{ producto.nombre }}</td>
+                            <td data-label="Categoría">{{ producto.categoria }}</td>
+                            <td data-label="Stock">{{ producto.stockActual }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+        <div class="modal-footer">
+            <button class="cancel-button" (click)="closeProductsModal()">
+                <i class="fas fa-check"></i> Aceptar
+            </button>
+        </div>
     </div>
-</div> 
+</div>
+
+<!-- Delivery Completion Modal -->
+<div class="modal" [class.show]="showDeliveryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Finalizar Entrega</h3>
+            <button class="close-modal" (click)="closeDeliveryModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="deliveryForm" (ngSubmit)="submitDelivery(selectedOrder)" class="delivery-form">
+                <div class="form-group">
+                    <label for="recipient">Persona que Recibe</label>
+                    <input type="text" id="recipient" formControlName="recipient" 
+                           placeholder="Nombre de la persona que recibe" required>
+                    <div class="error-message" *ngIf="deliveryForm.get('recipient')?.invalid && 
+                                                    deliveryForm.get('recipient')?.touched">
+                        El nombre del receptor es requerido
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="observations">Observaciones</label>
+                    <textarea id="observations" formControlName="observations" 
+                              placeholder="Ingrese observaciones sobre la entrega"
+                              rows="4"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-button" (click)="closeDeliveryModal()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="submit-button" (click)="submitDelivery(selectedOrder)" 
+                    [disabled]="!deliveryForm.valid">
+                <i class="fas fa-check"></i> Finalizar Entrega
+            </button>
+        </div>
+    </div>
+</div>

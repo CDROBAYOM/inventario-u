@@ -1,43 +1,41 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-
-export interface OrderItem {
-  id: string;
-  nombre: string;
-  categoria: string;
-  cantidadSolicitada: number;
-  _id: string;
-}
-
-export interface Order {
-  _id: string;
-  deliveryStatus: string;
-  items: OrderItem[];
-  orderId: string;
-  applicationDate: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PedidoService } from '../pedido/services/pedido.services';
+import { Pedido } from '../pedido/models/pedido.models';
 
 @Component({
   selector: 'app-solicitudes',
   templateUrl: './solicitudes.component.html',
   styleUrls: ['./solicitudes.component.css'],
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule]
+  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule]
 })
 export class SolicitudesComponent implements OnInit {
-  orders: Order[] = [];
-  filteredOrders: Order[] = [];
   isLoading = true;
   errorMessage = '';
   searchTerm: string = '';
   searchDate: string = '';
+  pedidos: Pedido[] = [];
+  filteredOrders: Pedido[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  expandedOrders: Set<string> = new Set();
+  showProductsModal = false;
+  showDeliveryModal = false;
+  selectedOrder: Pedido | null = null;
+  deliveryForm: FormGroup;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private pedidoService: PedidoService,
+    private fb: FormBuilder
+  ) {
+    this.deliveryForm = this.fb.group({
+      recipient: ['', Validators.required],
+      observations: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -45,64 +43,86 @@ export class SolicitudesComponent implements OnInit {
 
   loadOrders(): void {
     this.isLoading = true;
-    this.http.get<Order[]>('http://localhost:3000/api/productos')
-      .subscribe({
-        next: (orders) => {
-          console.log(orders);
-          this.orders = orders;
-          this.filteredOrders = [...orders];
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error loading orders:', error);
-          this.errorMessage = 'Error al cargar las órdenes. Por favor, intente nuevamente.';
-          this.isLoading = false;
-        }
-      });      
+    this.pedidoService.getPedidos().subscribe({
+      next: (pedidos: Pedido[]) => {
+        this.pedidos = pedidos;
+        this.filteredOrders = [...pedidos];
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading orders:', error);
+        this.errorMessage = 'Error al cargar los pedidos';
+        this.isLoading = false;
+      }
+    });
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return 'No disponible';
-    
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Fecha inválida';
+  getPaginatedOrders(): Pedido[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredOrders.slice(startIndex, endIndex);
+  }
 
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+  get totalPages(): number {
+    return Math.ceil(this.filteredOrders.length / this.itemsPerPage);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
   }
 
   getLastThreeChars(orderId: string): string {
     return orderId.slice(-5);
   }
 
-  searchOrders(): void {
-    if (!this.searchTerm && !this.searchDate) {
-      this.filteredOrders = [...this.orders];
-      return;
-    }
-
-    this.filteredOrders = this.orders.filter(order => {
-      const matchesSearchTerm = this.searchTerm 
-        ? order.orderId.toLowerCase().includes(this.searchTerm.toLowerCase())
-        : true;
-
-      const matchesDate = this.searchDate
-        ? new Date(order.applicationDate).toISOString().split('T')[0] === this.searchDate
-        : true;
-
-      return matchesSearchTerm && matchesDate;
-    });
-  }
-
   clearSearch(): void {
     this.searchTerm = '';
     this.searchDate = '';
-    this.filteredOrders = [...this.orders];
+    this.filteredOrders = [...this.pedidos];
+    this.currentPage = 1;
+  }
+
+  openProductsModal(order: Pedido): void {
+    this.selectedOrder = order;
+    this.showProductsModal = true;
+  }
+
+  closeProductsModal(): void {
+    this.showProductsModal = false;
+    this.selectedOrder = null;
+  }
+
+  openDeliveryModal(order: Pedido): void {
+    this.selectedOrder = order;
+    this.showDeliveryModal = true;
+    this.deliveryForm.reset();
+  }
+
+  closeDeliveryModal(): void {
+    this.showDeliveryModal = false;
+    this.selectedOrder = null;
+    this.deliveryForm.reset();
+  }
+
+  submitDelivery(pedido: Pedido | null) {
+    if (pedido) {
+      this.pedidoService.updatePedido(pedido).subscribe({
+        next: (updatedPedido) => {
+          console.log('Pedido actualizado:', updatedPedido);
+        },
+        error: (error) => {
+          console.error('Error al actualizar el pedido:', error);
+          console.log(pedido);
+        }
+      });
+    }
   }
 } 

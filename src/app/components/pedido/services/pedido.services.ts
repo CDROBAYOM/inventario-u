@@ -20,4 +20,9 @@ export class PedidoService {
     createPedido(pedido: Pedido): Observable<Pedido> {
         return this.http.post<Pedido>(this.apiUrl, pedido);
     }
+
+    updatePedido(pedido: Pedido): Observable<Pedido> {
+        return this.http.put<Pedido>(`${this.apiUrl}/${pedido.pedidoId}`, pedido);
+    }
+
 }
