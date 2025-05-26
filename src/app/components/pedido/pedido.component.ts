@@ -128,7 +128,8 @@ export class PedidoComponent implements OnInit {
         categoria: item.categoria,
         estado: item.estado
       })),
-      personaQueRecoge: ''
+      personaQueRecoge: '',
+      observaciones: ''
     };
     
     this.pedidoService.createPedido(pedido).subscribe({

@@ -9,5 +9,6 @@ export interface Pedido {
     categoria: string;
     productos: Producto[];
     personaQueRecoge: string;    
+    observaciones: string;
 }
 

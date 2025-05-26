@@ -5,6 +5,13 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { PedidoService } from '../pedido/services/pedido.services';
 import { Pedido } from '../pedido/models/pedido.models';
 
+interface EntregaPedido {
+  pedidoId: string;
+  estado: string;
+  personaQueRecogio: string;
+  observaciones: string;
+}
+
 @Component({
   selector: 'app-solicitudes',
   templateUrl: './solicitudes.component.html',
@@ -32,6 +39,7 @@ export class SolicitudesComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.deliveryForm = this.fb.group({
+      estado: ['', Validators.required],
       recipient: ['', Validators.required],
       observations: ['']
     });
@@ -114,13 +122,21 @@ export class SolicitudesComponent implements OnInit {
 
   submitDelivery(pedido: Pedido | null) {
     if (pedido) {
-      this.pedidoService.updatePedido(pedido).subscribe({
+      const entregaPedido: EntregaPedido = {
+        pedidoId: pedido.pedidoId,
+        estado: this.deliveryForm.value.estado,
+        personaQueRecogio: this.deliveryForm.value.recipient,
+        observaciones: this.deliveryForm.value.observations
+      };
+
+      this.pedidoService.entregarPedido(entregaPedido).subscribe({
         next: (updatedPedido) => {
           console.log('Pedido actualizado:', updatedPedido);
+          this.closeDeliveryModal();
+          this.loadOrders();
         },
         error: (error) => {
           console.error('Error al actualizar el pedido:', error);
-          console.log(pedido);
         }
       });
     }

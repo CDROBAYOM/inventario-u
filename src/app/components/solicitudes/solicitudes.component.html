@@ -102,6 +102,20 @@
         <div class="modal-body">
             <form [formGroup]="deliveryForm" (ngSubmit)="submitDelivery(selectedOrder)" class="delivery-form">
                 <div class="form-group">
+                    <label for="estado">Estado</label>
+                    <select id="estado" formControlName="estado" required>
+                        <option value="">Seleccione un estado</option>
+                        <option value="ENTREGADO">Entregado</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="CANCELADO">Cancelado</option>
+                    </select>
+                    <div class="error-message" *ngIf="deliveryForm.get('estado')?.invalid && 
+                                                    deliveryForm.get('estado')?.touched">
+                        El estado es requerido
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="recipient">Persona que Recibe</label>
                     <input type="text" id="recipient" formControlName="recipient" 
                            placeholder="Nombre de la persona que recibe" required>
