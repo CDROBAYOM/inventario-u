@@ -1,0 +1,16 @@
+<nav class="navbar" *ngIf="authService.isLoggedIn()">
+  <div class="nav-container">
+    <div class="nav-brand">Inventario U</div>
+    <button class="menu-button" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="nav-links" [class.active]="isMenuOpen">
+      <a routerLink="/pedidos" routerLinkActive="active" (click)="closeMenu()">Pedidos</a>
+      <a routerLink="/orders" routerLinkActive="active" (click)="closeMenu()">Solicitudes</a>
+      <a routerLink="/products" routerLinkActive="active" (click)="closeMenu()">Productos</a>
+      <button class="logout-button" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </div>
+</nav> 
