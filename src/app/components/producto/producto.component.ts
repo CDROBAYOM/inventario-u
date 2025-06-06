@@ -56,7 +56,7 @@ export class ProductoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadProducts();    
+    this.loadProducts();
   }
 
   loadProducts(): void {
@@ -75,6 +75,7 @@ export class ProductoComponent implements OnInit {
 
 
   openAddProductModal(): void {
+    this.isEditing = false;
     this.showModal = true;
     this.productForm.reset({
       estado: 'ACTIVO',
@@ -88,6 +89,7 @@ export class ProductoComponent implements OnInit {
     this.showModal = false;
     this.productForm.reset();
     this.previewUrl = null;
+    this.isEditing = false;
     this.selectedFile = null;
   }
 
@@ -118,20 +120,18 @@ export class ProductoComponent implements OnInit {
         formData.append('imagen', this.selectedFile);
       }
 
-      this.productoService.createProducto(formData).subscribe({
-        next: (response: Producto) => {
-          this.userMessage = 'Producto creado exitosamente';
-          this.closeModal();
-          this.loadProducts();
-        },
-        error: (error: any) => {
-          console.error('Error al crear producto:', error);
-          this.userMessage = 'Error al crear el producto. Por favor, intente nuevamente.';
-        },
-        complete: () => {
-          this.isLoading = false;
-        }
-      });
+      
+      const productId = this.selectedProduct?.productoId; 
+      if (this.isEditing === false) {
+        this.createProduct(formData);       
+      } 
+      if (productId !== undefined && this.isEditing !== false ) {
+        this.updateProduct(formData, productId);
+      }
+      else {               
+        
+      }
+
     }
   }
 
@@ -142,7 +142,7 @@ export class ProductoComponent implements OnInit {
     this.userMessage = '';
   }
 
-  editProduct(product: Producto): void {
+  loadEditProduct(product: Producto): void {
     this.isEditing = true;
     this.selectedProduct = product;
     this.productForm.patchValue({
@@ -150,31 +150,53 @@ export class ProductoComponent implements OnInit {
       descripcion: product.descripcion,
       categoria: product.categoria,
       stockActual: product.stockActual,
-      estado: product.estado
-    });
+      estado: product.estado,
+      productoId: product.productoId,
+      imagenURL: product.imagenURL,
+    });    
     this.previewUrl = product.imagenURL;
     this.showModal = true;
   }
 
+  createProduct(formData: FormData): void {
+    this.productoService.createProducto(formData).subscribe({
+      next: (response: Producto) => {
+        this.userMessage = 'Producto creado exitosamente';
+        this.closeModal();
+        this.loadProducts();
+      }
+    })
+  }
+
+  updateProduct(formData: FormData, productId: string): void {
+    this.productoService.updateProducto(productId, formData).subscribe({
+      next: (response: Producto) => {
+        this.userMessage = 'Producto actualizado exitosamente';
+        this.closeModal();
+        this.loadProducts();
+      }
+    })
+  }
+
   deleteProduct(product: Producto): void {
     console.log(product.productoId);
-    if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {        
-        return; // Cancelar si el usuario no confirma
+    if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {
+      return; // Cancelar si el usuario no confirma
     }
 
     this.userMessage = 'Eliminando producto...';
 
     this.productoService.deleteProducto(product.productoId).subscribe({
-        next: () => {
-            // Eliminar el producto de la lista local solo si la API responde exitosamente
-            this.products = this.products.filter(p => p.productoId !== product.productoId);
-            this.userMessage = 'Producto eliminado exitosamente.';
-            this.resetForm(); // Limpiar formulario si el producto eliminado era el seleccionado
-        },
-        error: (error: any) => {
-            console.error('Error al eliminar producto:', error);
-             this.userMessage = 'Error al eliminar el producto.';
-        }
+      next: () => {
+        // Eliminar el producto de la lista local solo si la API responde exitosamente
+        this.products = this.products.filter(p => p.productoId !== product.productoId);
+        this.userMessage = 'Producto eliminado exitosamente.';
+        this.resetForm(); // Limpiar formulario si el producto eliminado era el seleccionado
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar producto:', error);
+        this.userMessage = 'Error al eliminar el producto.';
+      }
     });
   }
 
