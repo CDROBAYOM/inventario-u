@@ -12,8 +12,10 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  name: string = '';
   username: string = '';
   password: string = '';
+  agreeToTerms: boolean = false;
   isLoading: boolean = false;
   errorMessage: string = '';
 
@@ -23,7 +25,8 @@ export class LoginComponent {
   ) {}
 
   onSubmit() {
-    if (this.username && this.password) {
+    // TODO: Implement signup logic
+     if (this.username && this.password) {
       this.isLoading = true;
       this.errorMessage = '';
 
@@ -37,6 +40,5 @@ export class LoginComponent {
           this.isLoading = false;
         }
       });
-    }
-  }
+    }   }
 } 
