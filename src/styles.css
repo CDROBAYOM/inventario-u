@@ -1370,3 +1370,530 @@ app-producto .btn-retry {
     flex-direction: column;
   }
 }
+
+/* Pedido Component Styles - Updated for Minimalist Design */
+app-pedido .container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f9fafb;
+}
+
+app-pedido .header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+app-pedido .header-actions h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+app-pedido .header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+app-pedido .search-filter {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+app-pedido .search-filter input,
+app-pedido .search-filter select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+}
+
+app-pedido .search-filter input {
+  min-width: 200px;
+}
+
+app-pedido .search-filter input:focus,
+app-pedido .search-filter select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+app-pedido .cart-button {
+  position: relative;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+app-pedido .cart-button:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+app-pedido .cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+app-pedido .table-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+app-pedido table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+app-pedido th, app-pedido td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+app-pedido th {
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 12px;
+}
+
+app-pedido td {
+  color: #374151;
+  vertical-align: middle;
+}
+
+app-pedido tr:last-child td {
+  border-bottom: none;
+}
+
+app-pedido tr:hover {
+  background-color: #f9fafb;
+}
+
+app-pedido .product-image {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+app-pedido .stock-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+app-pedido .stock-badge.low-stock {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+app-pedido .quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+app-pedido .qty-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+app-pedido .qty-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+app-pedido .qty-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+app-pedido .qty-value {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+app-pedido .action-btn {
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+app-pedido .action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+app-pedido .action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+app-pedido .action-btn.add {
+  background-color: #10b981;
+}
+
+app-pedido .action-btn.add:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+/* Cart Sidebar Styles */
+app-pedido .cart-sidebar {
+  position: fixed;
+  right: -400px;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+app-pedido .cart-sidebar.open {
+  right: 0;
+}
+
+app-pedido .cart-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+app-pedido .cart-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+app-pedido .close-cart {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  line-height: 1;
+}
+
+app-pedido .cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+app-pedido .cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+app-pedido .cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+app-pedido .item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+app-pedido .item-details h4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+app-pedido .item-details p {
+  margin: 0;
+  color: #666;
+  font-size: 12px;
+}
+
+app-pedido .remove-item {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+app-pedido .remove-item:hover {
+  background-color: #fee2e2;
+}
+
+app-pedido .empty-cart {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+app-pedido .empty-cart i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #ddd;
+}
+
+app-pedido .cart-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+app-pedido .cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+app-pedido .checkout-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+app-pedido .checkout-btn:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+app-pedido .checkout-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Floating Popup */
+app-pedido .floating-popup {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+app-pedido .floating-popup.success {
+  background-color: #10b981;
+}
+
+app-pedido .floating-popup.error {
+  background-color: #ef4444;
+}
+
+app-pedido .popup-content {
+  text-align: center;
+}
+
+app-pedido .popup-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+app-pedido .btn-accept,
+app-pedido .btn-retry {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+app-pedido .btn-accept {
+  background-color: #3b82f6;
+  color: white;
+}
+
+app-pedido .btn-retry {
+  background-color: #f59e0b;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  app-pedido .header-actions {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  app-pedido .header-actions h1 {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+
+  app-pedido .header-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  app-pedido .search-filter {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  app-pedido .search-filter input,
+  app-pedido .search-filter select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  app-pedido table {
+    display: block;
+    width: 100%;
+  }
+
+  app-pedido thead {
+    display: none;
+  }
+
+  app-pedido tbody, app-pedido tr, app-pedido td {
+    display: block;
+    width: 100%;
+  }
+
+  app-pedido tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+    padding: 16px;
+  }
+
+  app-pedido td {
+    padding: 8px 0;
+    text-align: left;
+    position: relative;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  app-pedido td:last-child {
+    border-bottom: none;
+  }
+
+  app-pedido td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    font-weight: 500;
+    color: #6b7280;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  app-pedido .product-image {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  app-pedido .quantity-controls {
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  app-pedido .cart-sidebar {
+    width: 100%;
+    right: -100%;
+  }
+}
