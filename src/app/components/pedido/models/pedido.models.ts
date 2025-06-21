@@ -8,7 +8,7 @@ export interface Pedido {
     coordinacionId: string;
     categoria: string;
     productos: Producto[];
-    personaQueRecoge: string;    
+    personaQueRecogio: string;    
     observaciones: string;
 }
 

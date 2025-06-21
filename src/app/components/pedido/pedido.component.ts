@@ -44,9 +44,10 @@ export class PedidoComponent implements OnInit {
   loadInventory(): void {    
     this.productoService.getProductos().subscribe({
       next: (productos) => {
-        this.products = productos;
-        this.filteredProducts = [...productos];
-        this.categories = [...new Set(productos.map(p => p.categoria))];
+        const availableProducts = productos.filter(p => p.estado.toLowerCase() === 'disponible');
+        this.products = availableProducts;
+        this.filteredProducts = [...availableProducts];
+        this.categories = [...new Set(availableProducts.map(p => p.categoria))];
         this.userMessage = '';
       },
       error: (error) => {
@@ -128,7 +129,7 @@ export class PedidoComponent implements OnInit {
         categoria: item.categoria,
         estado: item.estado
       })),
-      personaQueRecoge: '',
+      personaQueRecogio: '',
       observaciones: ''
     };
     

@@ -26,6 +26,7 @@ export class SolicitudesComponent implements OnInit {
   searchDate: string = '';
   pedidos: Pedido[] = [];
   filteredOrders: Pedido[] = [];
+  statusFilter: string = 'ALL';
   currentPage: number = 1;
   itemsPerPage: number = 10;
   expandedOrders: Set<string> = new Set();
@@ -53,8 +54,9 @@ export class SolicitudesComponent implements OnInit {
     this.isLoading = true;
     this.pedidoService.getPedidos().subscribe({
       next: (pedidos: Pedido[]) => {
+        console.log(pedidos);
         this.pedidos = pedidos;
-        this.filteredOrders = [...pedidos];
+        this.applyFilters();
         this.isLoading = false;
       },
       error: (error: any) => {
@@ -63,6 +65,33 @@ export class SolicitudesComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  applyStatusFilter(status: string): void {
+    this.statusFilter = status;
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    this.currentPage = 1;
+    let filtered = [...this.pedidos];
+
+    // Status filter
+    if (this.statusFilter !== 'ALL') {
+      filtered = filtered.filter(p => p.estado === this.statusFilter);
+    }
+
+    // Search term filter
+    if (this.searchTerm) {
+      const lowerCaseSearch = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.pedidoId.toLowerCase().includes(lowerCaseSearch) ||
+        order.categoria.toLowerCase().includes(lowerCaseSearch) ||
+        order.personaQueRecogio.toLowerCase().includes(lowerCaseSearch)
+      );      
+    }
+
+    this.filteredOrders = filtered;
   }
 
   getPaginatedOrders(): Pedido[] {
@@ -121,7 +150,7 @@ export class SolicitudesComponent implements OnInit {
   }
 
   submitDelivery(pedido: Pedido | null) {
-    if (pedido) {
+    if (pedido) {      
       const entregaPedido: EntregaPedido = {
         pedidoId: pedido.pedidoId,
         estado: this.deliveryForm.value.estado,
@@ -140,5 +169,18 @@ export class SolicitudesComponent implements OnInit {
         }
       });
     }
+  }
+
+  getAvailableProducts(order: Pedido | null): any[] {
+    if (!order) {
+      return [];
+    }
+    return order.productos.filter(p => p.estado.toLowerCase() === 'disponible');
+  }
+
+  generateDelivery(pedido: Pedido) {
+    // Placeholder for delivery generation logic
+    alert(`Funcionalidad para generar entrega para el pedido ${pedido.pedidoId} no implementada.`);
+    console.log('Generar entrega para:', pedido);
   }
 } 

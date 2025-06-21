@@ -59,7 +59,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #dc3545;
+  border-color: #EF5350;
 }
 
 .form-group.full-width {
@@ -162,12 +162,12 @@ th {
 }
 
 .btn-edit {
-  background-color: #ffc107;
+  background-color: #F5F5F5;
   color: #333;
 }
 
 .btn-edit:hover {
-  background-color: #ffb300;
+  background-color: #F9A825;
 }
 
 .btn-delete {

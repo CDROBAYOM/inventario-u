@@ -1,57 +1,85 @@
-<div class="orders-container">
-    <h1>Solicitudes Generadas</h1>
-
-    <div class="orders-list">
-        <div *ngIf="filteredOrders.length === 0" class="empty-orders">
-            <i class="fas fa-clipboard-list"></i>
-            <p>No se encontraron pedidos</p>
-        </div>
-
-        <div *ngFor="let order of getPaginatedOrders()" class="order-card">
-            <div class="order-details">
-                <div class="detail-row">
-                    <span class="label">Estado:</span>
-                    <span class="value status-badge" [class]="'status-' + order.estado.toLowerCase()">
-                        {{ order.estado }}
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Categoría:</span>
-                    <span class="value">{{ order.categoria }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Cantidad:</span>
-                    <span class="value">{{ order.cantidad }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Persona que recoge:</span>
-                    <span class="value">{{ order.personaQueRecoge }}</span>
-                </div>
-                <div class="detail-row">
-                    <button class="view-products-btn" (click)="openProductsModal(order)">
-                        <i class="fas fa-boxes"></i> Ver Productos
-                    </button>
-                </div>
-                <div class="detail-row">
-                    <button class="view-products-btn" (click)="openDeliveryModal(order)">
-                        <i class="fas fa-boxes"></i> Finalizar Entrega
-                    </button>
-                </div>                
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination" *ngIf="filteredOrders.length > 0">
-            <button (click)="previousPage()" [disabled]="currentPage === 1">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <span>Página {{ currentPage }} de {{ totalPages }}</span>
-            <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
+<div class="container">
+  <div class="filter-bar">
+    <div class="status-filters">
+      <button 
+        [class.active]="statusFilter === 'ALL'" 
+        (click)="applyStatusFilter('ALL')">Todos</button>
+      <button 
+        [class.active]="statusFilter === 'PENDIENTE'" 
+        (click)="applyStatusFilter('PENDIENTE')">Pendiente</button>
+      <button 
+        [class.active]="statusFilter === 'ENTREGADO'" 
+        (click)="applyStatusFilter('ENTREGADO')">Entregado</button>
+      <button 
+        [class.active]="statusFilter === 'CANCELADO'" 
+        (click)="applyStatusFilter('CANCELADO')">Cancelado</button>
     </div>
+    <div class="search-filter">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="Buscar..." 
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()">
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID Pedido</th>
+          <th>Estado</th>
+          <th>Categoría</th>
+          <th>Cantidad</th>
+          <th>Recoge</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of getPaginatedOrders()">
+          <td data-label="ID Pedido">{{ order.pedidoId.slice(-8) }}</td>
+          <td data-label="Estado">
+            <span class="status-badge" [class]="'status-' + order.estado.toLowerCase()">
+              {{ order.estado }}
+            </span>
+          </td>
+          <td data-label="Categoría">{{ order.categoria }}</td>
+          <td data-label="Cantidad">{{ order.cantidad }}</td>
+          <td data-label="Recoge">{{ order.personaQueRecogio }}</td>
+          <td data-label="Acciones">
+            <button class="action-btn" (click)="openProductsModal(order)" title="Ver Productos">
+              <i class="fas fa-eye"></i> Ver
+            </button>
+            <button class="action-btn" (click)="openDeliveryModal(order)" title="Finalizar Pedido">
+              <i class="fas fa-clipboard-check"></i> Finalizar
+            </button>
+            <!-- <button class="action-btn" (click)="generateDelivery(order)" title="Generar Entrega">
+              <i class="fas fa-truck"></i> Cancelar
+            </button> -->
+          </td>
+        </tr>
+        <tr *ngIf="getPaginatedOrders().length === 0">
+          <td colspan="6" class="no-results">No se encontraron solicitudes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-container" *ngIf="filteredOrders.length > itemsPerPage">
+    <div class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage === 1">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+  </div>
 </div>
+
 
 <!-- Products Modal -->
 <div class="modal" [class.show]="showProductsModal">
@@ -69,11 +97,11 @@
                         <tr>
                             <th>Nombre</th>
                             <th>Categoría</th>
-                            <th>Stock</th>
+                            <th>Cantidad</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let producto of selectedOrder.productos">
+                        <tr *ngFor="let producto of getAvailableProducts(selectedOrder)">
                             <td data-label="Nombre">{{ producto.nombre }}</td>
                             <td data-label="Categoría">{{ producto.categoria }}</td>
                             <td data-label="Stock">{{ producto.stockActual }}</td>
@@ -106,7 +134,6 @@
                     <select id="estado" formControlName="estado" required>
                         <option value="">Seleccione un estado</option>
                         <option value="ENTREGADO">Entregado</option>
-                        <option value="PENDIENTE">Pendiente</option>
                         <option value="CANCELADO">Cancelado</option>
                     </select>
                     <div class="error-message" *ngIf="deliveryForm.get('estado')?.invalid && 
