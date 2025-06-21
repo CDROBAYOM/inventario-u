@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule, RouterModule],
   templateUrl: './producto.component.html',
-  styleUrls: ['./producto.component.css']
+  styleUrls: []
 })
 
 export class ProductoComponent implements OnInit {

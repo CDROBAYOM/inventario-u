@@ -15,7 +15,7 @@ interface EntregaPedido {
 @Component({
   selector: 'app-solicitudes',
   templateUrl: './solicitudes.component.html',
-  styleUrls: ['./solicitudes.component.css'],
+  styleUrls: [],
   standalone: true,
   imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule]
 })

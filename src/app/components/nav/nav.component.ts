@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+  styleUrls: []
 })
 export class NavComponent {
   darkMode = false;
