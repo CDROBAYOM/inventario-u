@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 2rem;
+  padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: #f9fafb;
 }
 
 .form-container {
@@ -102,12 +103,12 @@
 }
 
 .btn-primary {
-  background-color: #dc3545;
+  background-color: #2E7D32;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #c82333;
+  background-color: #1b5e20;
 }
 
 .btn-secondary {
@@ -127,122 +128,107 @@
   overflow-x: auto;
 }
 
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.table-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
 }
 
 th, td {
-  padding: 1rem;
+  padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 th {
-  background-color: #f5f5f5;
-  font-weight: 600;
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  color: #374151;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
 
 .product-image {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-.status-active {
-  color: #4caf50;
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
   font-weight: 500;
+  text-transform: capitalize;
 }
 
-.status-inactive {
-  color: #f44336;
-  font-weight: 500;
+.status-disponible {
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
-.btn-edit {
-  background-color: #F5F5F5;
-  color: #333;
+.status-agotado {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
-.btn-edit:hover {
-  background-color: #F9A825;
-}
-
-.btn-delete {
-  background-color: #f44336;
+.action-btn {
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 5px;
   color: white;
+  transition: opacity 0.2s;
+  font-size: 13px;
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
-.btn-delete:hover {
-  background-color: #d32f2f;
+.action-btn:last-child {
+  margin-bottom: 0;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-
-  .form-container, .products-table {
-    padding: 1rem;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .form-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    padding: 0.625rem;
-    font-size: 0.9rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .btn {
-    width: 100%;
-  }
-
-  .image-preview {
-    height: 150px;
-  }
-
-  table {
-    font-size: 0.9rem;
-  }
-
-  th, td {
-    padding: 0.75rem;
-  }
+.action-btn:hover {
+  opacity: 0.85;
 }
 
-@media (max-width: 480px) {
-  .form-container {
-    margin: 0.5rem;
-    padding: 0.75rem;
-  }
+.action-btn i {
+  font-size: 13px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
 
-  .form-header h2 {
-    font-size: 1.3rem;
-  }
+.action-btn.view {
+  background-color: #2E7D32;
+}
 
-  .form-group label {
-    font-size: 0.9rem;
-  }
-
-  .image-preview {
-    height: 120px;
-  }
+.action-btn.edit {
+  background-color: #424242;
 }
 
 .message-container {
@@ -425,19 +411,6 @@ th {
 
 .modal-body {
     padding: 1.5rem;
-}
-
-/* Header Actions */
-.header-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1.5rem;
-}
-
-.header-actions .btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 /* Responsive Modal */

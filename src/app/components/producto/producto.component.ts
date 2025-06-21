@@ -215,4 +215,10 @@ export class ProductoComponent implements OnInit {
     this.userMessage = '';
     this.selectedFile = null;
   }
+
+  viewProduct(product: any): void {
+    alert(`Visualizando producto: ${product.nombre}`);
+    // Here you can implement logic to show a detail view or modal
+    console.log('Viewing product:', product);
+  }
 }

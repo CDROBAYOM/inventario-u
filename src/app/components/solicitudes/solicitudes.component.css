@@ -120,12 +120,19 @@ tr:last-child td {
 .action-btn {
   border: none;
   cursor: pointer;
-  padding: 6px 10px;
-  margin: 0 3px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
   border-radius: 5px;
   color: white;
   transition: opacity 0.2s;
   font-size: 13px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.action-btn:last-child {
+  margin-bottom: 0;
 }
 
 .action-btn:hover {
@@ -139,15 +146,15 @@ tr:last-child td {
 }
 
 .action-btn:nth-of-type(1) {
-  background-color: #2E7D32; /* Blue for View */
+  background-color: #2E7D32;
 }
 
 .action-btn:nth-of-type(2) {
-  background-color: #424242; /* Green for Finalize */
+  background-color: #424242;
 }
 
 .action-btn:nth-of-type(3) {
-  background-color: #A5D6A7; /* Gray for Cancel */
+  background-color: #6b7280; /* Gray for Cancel */
 }
 
 .no-results {

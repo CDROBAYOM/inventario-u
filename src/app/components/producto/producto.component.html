@@ -7,8 +7,7 @@
   </div>
 
   <!-- Products Table -->
-  <div class="products-table">
-    <h2>Lista de Productos</h2>
+  <div class="table-container">
     <table>
       <thead>
         <tr>
@@ -31,17 +30,17 @@
           <td>{{ product.categoria }}</td>
           <td>{{ product.stockActual }}</td>
           <td>
-            <span [class]="'status-' + product.estado.toLowerCase()">
+            <span class="status-badge" [class]="'status-' + product.estado.toLowerCase()">
               {{ product.estado }}
             </span>
           </td>
           <td>
-            <button class="btn btn-edit" (click)="loadEditProduct(product)">
-              <i class="fas fa-edit"></i>
-            </button>
-           <!--  <button class="btn btn-delete" (click)="deleteProduct(product)">
-              <i class="fas fa-trash"></i>
+<!--             <button class="action-btn view" (click)="viewProduct(product)">
+              <i class="fas fa-eye"></i> Ver
             </button> -->
+            <button class="action-btn edit" (click)="loadEditProduct(product)">
+              <i class="fas fa-edit"></i> Editar
+            </button>
           </td>
         </tr>
       </tbody>
