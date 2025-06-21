@@ -1,8 +1,9 @@
 <div class="container">
-  <!-- Add Product Button -->
+  <!-- Header with Add Product Button -->
   <div class="header-actions">
+    <h1>Gestión de Productos</h1>
     <button class="btn btn-primary" (click)="openAddProductModal()">
-      <i class="fas fa-plus"></i> Agregar Nuevo Producto
+      <i class="fas fa-plus"></i> Agregar Producto
     </button>
   </div>
 
@@ -13,9 +14,8 @@
         <tr>
           <th>Imagen</th>
           <th>Nombre</th>
-          <th>Descripción</th>
           <th>Categoría</th>
-          <th>Cantidad</th>
+          <th>Stock</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -23,10 +23,9 @@
       <tbody>
         <tr *ngFor="let product of products">
           <td>
-            <img [src]="product.imagenURL" [alt]="product.nombre" class="product-image">
+            <img [src]="product.imagenURL" [alt]="product.nombre" class="product-image" (click)="viewProduct(product)">
           </td>
           <td>{{ product.nombre }}</td>
-          <td>{{ product.descripcion }}</td>
           <td>{{ product.categoria }}</td>
           <td>{{ product.stockActual }}</td>
           <td>
@@ -35,30 +34,35 @@
             </span>
           </td>
           <td>
-<!--             <button class="action-btn view" (click)="viewProduct(product)">
-              <i class="fas fa-eye"></i> Ver
-            </button> -->
-            <button class="action-btn edit" (click)="loadEditProduct(product)">
-              <i class="fas fa-edit"></i> Editar
-            </button>
+            <div class="action-buttons">
+              <button class="action-btn view" (click)="viewProduct(product)" title="Ver detalles">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit" (click)="openEditProductModal(product)" title="Editar producto">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" (click)="deleteProduct(product)" title="Eliminar producto">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Add Product Modal -->
+  <!-- Product Modal (Add/Edit) -->
   <div class="modal" [class.show]="showModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Agregar Nuevo Producto</h2>
+        <h2>{{ isEditing ? 'Editar Producto' : 'Agregar Nuevo Producto' }}</h2>
         <button class="close-modal" (click)="closeModal()">&times;</button>
       </div>
       <div class="modal-body">
         <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="form-container">
           <div class="form-grid">
             <div class="form-group">
-              <label for="nombre">Nombre</label>
+              <label for="nombre">Nombre *</label>
               <input type="text" id="nombre" formControlName="nombre" required>
               <div class="error-message" *ngIf="productForm.get('nombre')?.invalid && productForm.get('nombre')?.touched">
                 El nombre es requerido
@@ -66,7 +70,7 @@
             </div>
 
             <div class="form-group">
-              <label for="categoria">Categoría</label>
+              <label for="categoria">Categoría *</label>
               <select id="categoria" formControlName="categoria" required>
                 <option value="">Seleccione una categoría</option>
                 <option *ngFor="let category of categories" [value]="category">
@@ -79,7 +83,7 @@
             </div>
 
             <div class="form-group full-width">
-              <label for="descripcion">Descripción</label>
+              <label for="descripcion">Descripción *</label>
               <textarea id="descripcion" formControlName="descripcion" rows="3" required></textarea>
               <div class="error-message" *ngIf="productForm.get('descripcion')?.invalid && productForm.get('descripcion')?.touched">
                 La descripción es requerida
@@ -87,7 +91,7 @@
             </div>
 
             <div class="form-group">
-              <label for="stockActual">Stock Actual</label>
+              <label for="stockActual">Stock Actual *</label>
               <input type="number" id="stockActual" formControlName="stockActual" required min="0">
               <div class="error-message" *ngIf="productForm.get('stockActual')?.invalid && productForm.get('stockActual')?.touched">
                 El stock es requerido y debe ser mayor o igual a 0
@@ -95,7 +99,7 @@
             </div>
 
             <div class="form-group">
-              <label for="estado">Estado</label>
+              <label for="estado">Estado *</label>
               <select id="estado" formControlName="estado" required>
                 <option value="DISPONIBLE">Disponible</option>
                 <option value="AGOTADO">No Disponible</option>
@@ -106,10 +110,13 @@
             </div>
 
             <div class="form-group full-width">
-              <label for="imagen">Imagen</label>
+              <label for="imagen">Imagen {{ isEditing ? '(Opcional)' : '*' }}</label>
               <input type="file" id="imagen" (change)="onFileSelected($event)" accept="image/*">
               <div class="image-preview" *ngIf="previewUrl">
                 <img [src]="previewUrl" alt="Preview">
+              </div>
+              <div class="image-info" *ngIf="isEditing && selectedProduct?.imagenURL && !selectedFile">
+                <p><small>Imagen actual: {{ selectedProduct?.imagenURL }}</small></p>
               </div>
             </div>
           </div>
@@ -117,10 +124,46 @@
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
             <button type="submit" class="btn btn-primary" [disabled]="!productForm.valid || isLoading">
-              {{ isLoading ? 'Guardando...' : 'Guardar' }}
+              <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+              {{ isLoading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Guardar') }}
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Product Modal -->
+  <div class="modal" [class.show]="showViewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Detalles del Producto</h2>
+        <button class="close-modal" (click)="closeViewModal()">&times;</button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProduct">
+        <div class="product-details">
+          <div class="product-image-large">
+            <img [src]="selectedProduct.imagenURL" [alt]="selectedProduct.nombre">
+          </div>
+          <div class="product-info-details">
+            <h3>{{ selectedProduct.nombre }}</h3>
+            <p><strong>Categoría:</strong> {{ selectedProduct.categoria }}</p>
+            <p><strong>Descripción:</strong> {{ selectedProduct.descripcion }}</p>
+            <p><strong>Stock Actual:</strong> {{ selectedProduct.stockActual }}</p>
+            <p><strong>Estado:</strong> 
+              <span class="status-badge" [class]="'status-' + selectedProduct.estado.toLowerCase()">
+                {{ selectedProduct.estado }}
+              </span>
+            </p>
+            <p><strong>ID:</strong> {{ selectedProduct.productoId }}</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="closeViewModal()">Cerrar</button>
+          <button class="btn btn-primary" (click)="editFromView()">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+        </div>
       </div>
     </div>
   </div>

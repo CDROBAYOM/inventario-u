@@ -20,6 +20,7 @@ export class ProductoComponent implements OnInit {
   products: Producto[] = [];
   categories: string[] = ['REGIONAL 1', 'REGIONAL 2', 'REGIONAL 3', 'REGIONAL 4', 'REGIONAL 5', 'GERENCIA'];
   showModal: boolean = false;
+  showViewModal: boolean = false;
   isLoading: boolean = false;
   userMessage: string = '';
   previewUrl: string | null = null;
@@ -51,7 +52,7 @@ export class ProductoComponent implements OnInit {
       descripcion: ['', Validators.required],
       categoria: ['', Validators.required],
       stockActual: [0, [Validators.required, Validators.min(0)]],
-      estado: ['ACTIVO', Validators.required]
+      estado: ['DISPONIBLE', Validators.required]
     });
   }
 
@@ -73,16 +74,31 @@ export class ProductoComponent implements OnInit {
     });
   }
 
-
   openAddProductModal(): void {
     this.isEditing = false;
     this.showModal = true;
     this.productForm.reset({
-      estado: 'ACTIVO',
+      estado: 'DISPONIBLE',
       stockActual: 0
     });
     this.previewUrl = null;
     this.selectedFile = null;
+    this.selectedProduct = null;
+  }
+
+  openEditProductModal(product: Producto): void {
+    this.isEditing = true;
+    this.selectedProduct = product;
+    this.productForm.patchValue({
+      nombre: product.nombre,
+      descripcion: product.descripcion,
+      categoria: product.categoria,
+      stockActual: product.stockActual,
+      estado: product.estado
+    });    
+    this.previewUrl = product.imagenURL;
+    this.selectedFile = null;
+    this.showModal = true;
   }
 
   closeModal(): void {
@@ -91,6 +107,24 @@ export class ProductoComponent implements OnInit {
     this.previewUrl = null;
     this.isEditing = false;
     this.selectedFile = null;
+    this.selectedProduct = null;
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedProduct = null;
+  }
+
+  viewProduct(product: Producto): void {
+    this.selectedProduct = product;
+    this.showViewModal = true;
+  }
+
+  editFromView(): void {
+    this.closeViewModal();
+    if (this.selectedProduct) {
+      this.openEditProductModal(this.selectedProduct);
+    }
   }
 
   onFileSelected(event: Event): void {
@@ -120,18 +154,12 @@ export class ProductoComponent implements OnInit {
         formData.append('imagen', this.selectedFile);
       }
 
-      
       const productId = this.selectedProduct?.productoId; 
-      if (this.isEditing === false) {
+      if (!this.isEditing) {
         this.createProduct(formData);       
-      } 
-      if (productId !== undefined && this.isEditing !== false ) {
+      } else if (productId) {
         this.updateProduct(formData, productId);
       }
-      else {               
-        
-      }
-
     }
   }
 
@@ -142,30 +170,20 @@ export class ProductoComponent implements OnInit {
     this.userMessage = '';
   }
 
-  loadEditProduct(product: Producto): void {
-    this.isEditing = true;
-    this.selectedProduct = product;
-    this.productForm.patchValue({
-      nombre: product.nombre,
-      descripcion: product.descripcion,
-      categoria: product.categoria,
-      stockActual: product.stockActual,
-      estado: product.estado,
-      productoId: product.productoId,
-      imagenURL: product.imagenURL,
-    });    
-    this.previewUrl = product.imagenURL;
-    this.showModal = true;
-  }
-
   createProduct(formData: FormData): void {
     this.productoService.createProducto(formData).subscribe({
       next: (response: Producto) => {
         this.userMessage = 'Producto creado exitosamente';
         this.closeModal();
         this.loadProducts();
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error al crear producto:', error);
+        this.userMessage = 'Error al crear el producto.';
+        this.isLoading = false;
       }
-    })
+    });
   }
 
   updateProduct(formData: FormData, productId: string): void {
@@ -174,24 +192,28 @@ export class ProductoComponent implements OnInit {
         this.userMessage = 'Producto actualizado exitosamente';
         this.closeModal();
         this.loadProducts();
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error al actualizar producto:', error);
+        this.userMessage = 'Error al actualizar el producto.';
+        this.isLoading = false;
       }
-    })
+    });
   }
 
   deleteProduct(product: Producto): void {
-    console.log(product.productoId);
     if (!confirm(`¿Estás seguro de que deseas eliminar el producto "${product.nombre}"?`)) {
-      return; // Cancelar si el usuario no confirma
+      return;
     }
 
     this.userMessage = 'Eliminando producto...';
 
     this.productoService.deleteProducto(product.productoId).subscribe({
       next: () => {
-        // Eliminar el producto de la lista local solo si la API responde exitosamente
         this.products = this.products.filter(p => p.productoId !== product.productoId);
         this.userMessage = 'Producto eliminado exitosamente.';
-        this.resetForm(); // Limpiar formulario si el producto eliminado era el seleccionado
+        this.resetForm();
       },
       error: (error: any) => {
         console.error('Error al eliminar producto:', error);
@@ -200,25 +222,14 @@ export class ProductoComponent implements OnInit {
     });
   }
 
-  resetForm() {
-    this.newProduct = {
-      productoId: '',
-      nombre: '',
-      descripcion: '',
-      stockActual: 0,
-      imagenURL: '',
-      categoria: '',
-      estado: 'true'
-    };
-    this.isEditing = false;
-    this.selectedProduct = null;
-    this.userMessage = '';
+  resetForm(): void {
+    this.productForm.reset({
+      estado: 'DISPONIBLE',
+      stockActual: 0
+    });
+    this.previewUrl = null;
     this.selectedFile = null;
-  }
-
-  viewProduct(product: any): void {
-    alert(`Visualizando producto: ${product.nombre}`);
-    // Here you can implement logic to show a detail view or modal
-    console.log('Viewing product:', product);
+    this.selectedProduct = null;
+    this.isEditing = false;
   }
 }

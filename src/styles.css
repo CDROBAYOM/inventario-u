@@ -828,8 +828,18 @@ app-producto .container {
 
 app-producto .header-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+app-producto .header-actions h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
 }
 
 app-producto .table-container {
@@ -857,14 +867,20 @@ app-producto th {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-size: 12px;
 }
 
 app-producto td {
   color: #374151;
+  vertical-align: middle;
 }
 
 app-producto tr:last-child td {
   border-bottom: none;
+}
+
+app-producto tr:hover {
+  background-color: #f9fafb;
 }
 
 app-producto .product-image {
@@ -872,15 +888,72 @@ app-producto .product-image {
   height: 40px;
   object-fit: cover;
   border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+app-producto .product-image:hover {
+  transform: scale(1.1);
+}
+
+app-producto .action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+app-producto .action-btn {
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+app-producto .action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+app-producto .action-btn.view {
+  background-color: #3b82f6;
+}
+
+app-producto .action-btn.view:hover {
+  background-color: #2563eb;
+}
+
+app-producto .action-btn.edit {
+  background-color: #10b981;
+}
+
+app-producto .action-btn.edit:hover {
+  background-color: #059669;
+}
+
+app-producto .action-btn.delete {
+  background-color: #ef4444;
+}
+
+app-producto .action-btn.delete:hover {
+  background-color: #dc2626;
 }
 
 app-producto .status-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 500;
-  text-transform: capitalize;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 app-producto .status-disponible {
@@ -893,73 +966,249 @@ app-producto .status-agotado {
   color: #991b1b;
 }
 
-app-producto .action-btn {
+/* Modal and Form Styles */
+app-producto .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+app-producto .modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+app-producto .modal-content {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+app-producto .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+app-producto .modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+app-producto .close-modal {
+  background: none;
   border: none;
   cursor: pointer;
-  padding: 8px 12px;
-  margin-bottom: 4px;
-  border-radius: 5px;
-  color: white;
-  transition: opacity 0.2s;
-  font-size: 13px;
-  display: block;
-  width: 100%;
-  text-align: center;
+  font-size: 24px;
+  color: #9ca3af;
+  padding: 0;
+  line-height: 1;
 }
 
-app-producto .action-btn:last-child {
-  margin-bottom: 0;
+app-producto .modal-body {
+  padding: 24px;
+  overflow-y: auto;
 }
 
-app-producto .action-btn:hover {
-  opacity: 0.85;
+app-producto .form-container {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-app-producto .action-btn i {
-  font-size: 13px;
-  vertical-align: middle;
-  margin-right: 4px;
-}
-
-app-producto .action-btn.view {
-  background-color: #2E7D32;
-}
-
-app-producto .action-btn.edit {
-  background-color: #424242;
-}
-
-app-producto .modal-body .btn-primary {
-  background-color: #2E7D32;
-}
-
-app-producto .modal-body .btn-primary:hover {
-  background-color: #1b5e20;
-}
-
-app-producto .form-container, app-producto .products-table {
-  padding: 1rem;
-}
 app-producto .form-grid {
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
 }
-app-producto .form-header h2 {
-  font-size: 1.5rem;
+
+app-producto .form-group {
+  margin-bottom: 1.5rem;
 }
+
+app-producto .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+app-producto .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+}
+
 app-producto .form-group input,
 app-producto .form-group select,
 app-producto .form-group textarea {
-  padding: 0.625rem;
-  font-size: 0.9rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
-app-producto .form-actions {
-  flex-direction: column;
-  gap: 0.5rem;
+
+app-producto .form-group input:focus,
+app-producto .form-group select:focus,
+app-producto .form-group textarea:focus {
+  outline: none;
+  border-color: #EF5350;
 }
+
 app-producto .image-preview {
-  height: 150px;
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 0.5rem;
 }
+
+app-producto .image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+app-producto .image-info {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+app-producto .image-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+app-producto .error-message {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+app-producto .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+app-producto .btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+app-producto .btn-primary {
+  background-color: #2E7D32;
+  color: white;
+}
+
+app-producto .btn-primary:hover:not(:disabled) {
+  background-color: #1b5e20;
+}
+
+app-producto .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+app-producto .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+app-producto .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+app-producto .btn i {
+  margin-right: 0.5rem;
+}
+
+/* Product Details Modal Styles */
+app-producto .product-details {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+app-producto .product-image-large {
+  flex: 0 0 200px;
+}
+
+app-producto .product-image-large img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+app-producto .product-info-details {
+  flex: 1;
+}
+
+app-producto .product-info-details h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+app-producto .product-info-details p {
+  margin: 0.5rem 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+app-producto .product-info-details strong {
+  color: #333;
+  font-weight: 600;
+}
+
+app-producto .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* Floating Popup */
 app-producto .floating-popup {
   position: fixed;
   bottom: 20px;
@@ -972,4 +1221,152 @@ app-producto .floating-popup {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 2000;
   animation: slideIn 0.5s ease-out forwards;
+}
+
+app-producto .floating-popup.success {
+  background-color: #10b981;
+}
+
+app-producto .floating-popup.error {
+  background-color: #ef4444;
+}
+
+app-producto .popup-content {
+  text-align: center;
+}
+
+app-producto .popup-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+app-producto .btn-accept,
+app-producto .btn-retry {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+app-producto .btn-accept {
+  background-color: #3b82f6;
+  color: white;
+}
+
+app-producto .btn-retry {
+  background-color: #f59e0b;
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  app-producto .header-actions {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  app-producto .header-actions h1 {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+
+  app-producto table {
+    display: block;
+    width: 100%;
+  }
+
+  app-producto thead {
+    display: none;
+  }
+
+  app-producto tbody, app-producto tr, app-producto td {
+    display: block;
+    width: 100%;
+  }
+
+  app-producto tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+    padding: 16px;
+  }
+
+  app-producto td {
+    padding: 8px 0;
+    text-align: left;
+    position: relative;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  app-producto td:last-child {
+    border-bottom: none;
+  }
+
+  app-producto td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    font-weight: 500;
+    color: #6b7280;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  app-producto .action-buttons {
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  app-producto .product-image {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  app-producto .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  app-producto .form-actions {
+    flex-direction: column;
+  }
+
+  app-producto .product-details {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  app-producto .product-image-large {
+    flex: none;
+    text-align: center;
+  }
+
+  app-producto .product-image-large img {
+    max-width: 200px;
+  }
+
+  app-producto .modal-actions {
+    flex-direction: column;
+  }
 }
