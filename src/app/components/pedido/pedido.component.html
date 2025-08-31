@@ -26,53 +26,45 @@
         </div>
     </div>
 
-    <!-- Products Table -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Stock</th>
-                    <th>Cantidad</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let product of filteredProducts">
-                    <td>
-                        <img [src]="product.imagenURL" [alt]="product.nombre" class="product-image">
-                    </td>
-                    <td>{{ product.nombre }}</td>
-                    <td>{{ product.categoria }}</td>
-                    <td>
-                        <span class="stock-badge" [class.low-stock]="product.stockActual <= 5">
-                            {{ product.stockActual }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="quantity-controls">
-                            <button class="qty-btn" (click)="decreaseQuantity(product)" [disabled]="!getItemQuantity(product)">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <span class="qty-value">{{ getItemQuantity(product) }}</span>
-                            <button class="qty-btn" (click)="increaseQuantity(product)" [disabled]="product.stockActual <= getItemQuantity(product)">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <button class="action-btn add" 
-                                (click)="addToCart(product)" 
-                                [disabled]="!getItemQuantity(product)"
-                                title="Agregar al carrito">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Products Grid -->
+    <div class="products-grid">
+        <div class="product-card" *ngFor="let product of filteredProducts">
+            <div class="product-image-container">
+                <img [src]="product.imagenURL" [alt]="product.nombre" class="product-image">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">{{ product.nombre }}</h3>
+                <p class="product-category">{{ product.categoria }}</p>
+                <p class="product-stock">
+                    <span class="stock-badge" [class.low-stock]="product.stockActual <= 5">
+                        Stock: {{ product.stockActual }}
+                    </span>
+                </p>
+                <div class="quantity-controls">
+                    <button class="qty-btn" (click)="decreaseQuantity(product)" [disabled]="!getItemQuantity(product)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="qty-value">{{ getItemQuantity(product) }}</span>
+                    <button class="qty-btn" (click)="increaseQuantity(product)" [disabled]="product.stockActual <= getItemQuantity(product)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <button class="add-to-cart-btn" 
+                        (click)="addToCart(product)" 
+                        [disabled]="!getItemQuantity(product)"
+                        title="Agregar al carrito">
+                    <i class="fas fa-cart-plus"></i>
+                    Agregar al Carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredProducts.length === 0">
+        <i class="fas fa-search"></i>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
     </div>
 
     <!-- Cart Sidebar -->
