@@ -32,7 +32,6 @@
           <th>ID Pedido</th>
           <th>Estado</th>
           <th>Categoría</th>
-          <th>Cantidad</th>
           <th>Recoge</th>
           <th>Acciones</th>
         </tr>
@@ -46,7 +45,6 @@
             </span>
           </td>
           <td data-label="Categoría">{{ order.categoria }}</td>
-          <td data-label="Cantidad">{{ order.cantidad }}</td>
           <td data-label="Recoge">{{ order.personaQueRecogio }}</td>
           <td data-label="Acciones">
             <button class="action-btn" (click)="openProductsModal(order)" title="Ver Productos">
@@ -61,7 +59,7 @@
           </td>
         </tr>
         <tr *ngIf="getPaginatedOrders().length === 0">
-          <td colspan="6" class="no-results">No se encontraron solicitudes.</td>
+          <td colspan="5" class="no-results">No se encontraron solicitudes.</td>
         </tr>
       </tbody>
     </table>
