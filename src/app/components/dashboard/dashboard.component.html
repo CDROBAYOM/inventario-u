@@ -1,0 +1,165 @@
+<!-- Main Container -->
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard de Inventario</h1>
+      <p class="subtitle">Informes de stock y estado de productos</p>
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="refreshData()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+        {{ loading ? 'Cargando...' : 'Actualizar' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-boxes"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ informes.length }}</h3>
+        <p>Total Productos</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon disponible">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ getDisponiblesCount() }}</h3>
+        <p>Disponibles</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bajo-stock">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ getBajoStockCount() }}</h3>
+        <p>Bajo Stock</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon agotado">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ getAgotadosCount() }}</h3>
+        <p>Agotados</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-filter">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (ngModelChange)="onSearchChange()"
+          placeholder="Buscar productos..."
+          class="search-input">
+      </div>
+      <div class="filter-dropdown">
+        <select 
+          [(ngModel)]="selectedEstado" 
+          (ngModelChange)="onEstadoChange()"
+          class="estado-select">
+          <option value="">Todos los estados</option>
+          <option *ngFor="let estado of getEstadosUnicos()" [value]="estado">
+            {{ estado }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error }}</span>
+    <button class="retry-btn" (click)="loadInformes()">
+      <i class="fas fa-redo"></i>
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando informes...</p>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-section" *ngIf="!loading && !error">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Estado</th>
+            <th>Stock Actual</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let informe of filteredInformes" class="table-row">
+            <td class="product-name">
+              <div class="product-info">
+                <i class="fas fa-box product-icon"></i>
+                <span>{{ informe.nombre }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="estado-badge" [class]="getEstadoClass(informe.estado)">
+                {{ informe.estado }}
+              </span>
+            </td>
+            <td class="stock-value">
+              <span class="stock-number">{{ informe.stockActual }}</span>
+            </td>
+            <td class="actions">
+              <button class="action-btn view-btn" title="Ver detalles">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit-btn" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredInformes.length === 0 && !loading">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>No se encontraron resultados</h3>
+      <p>Intenta ajustar los filtros de búsqueda</p>
+      <button class="clear-filters-btn" (click)="searchTerm = ''; selectedEstado = ''; filterInformes()">
+        Limpiar filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Footer -->
+  <div class="summary-footer" *ngIf="!loading && !error && filteredInformes.length > 0">
+    <div class="summary-info">
+      <span>Mostrando {{ filteredInformes.length }} de {{ informes.length }} productos</span>
+    </div>
+    <div class="summary-actions">
+      <button class="export-btn">
+        <i class="fas fa-download"></i>
+        Exportar
+      </button>
+    </div>
+  </div>
+</div>

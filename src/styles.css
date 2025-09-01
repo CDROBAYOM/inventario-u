@@ -394,6 +394,92 @@ app-nav .logout-button .icon {
   margin-right: 15px;
 }
 
+/* Mobile Menu Styles */
+app-nav .mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1002;
+  cursor: pointer;
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+app-nav .hamburger {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+app-nav .hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #333;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+app-nav .hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+app-nav .hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+app-nav .hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+app-nav .mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+app-nav .mobile-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  app-nav .mobile-menu-toggle {
+    display: block;
+  }
+
+  app-nav .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    z-index: 1001;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  app-nav .sidebar.mobile-open {
+    left: 0;
+  }
+
+  app-nav .sidebar-header {
+    padding-top: 60px;
+  }
+}
+
 /* Solicitudes Component Styles */
 app-solicitudes .container {
   padding: 24px;

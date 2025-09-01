@@ -13,8 +13,17 @@ import { FormsModule } from '@angular/forms';
 })
 export class NavComponent {
   darkMode = false;
+  isMobileMenuOpen = false;
 
   constructor(public authService: AuthService) {}
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
 
   logout() {
     this.authService.logout();
